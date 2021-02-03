@@ -1,0 +1,18 @@
+app:
+  host: localhost
+  port: 8080
+  read_timeout: 10s
+  write_timeout: 10s
+  max_header_mbytes: 1
+
+db:
+  host: localhost
+  port: 3306
+  username: root
+  password: root
+  db_name: dev-simple-blog
+  charset: utf8
+
+auth:
+  jwt_signing_key: jwt-signing-key
+  jwt_expires_time: 24h
