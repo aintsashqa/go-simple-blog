@@ -22,6 +22,9 @@ func Migrate(connection *sqlx.DB) error {
 		"file://./migrations",
 		"mysql", driver,
 	)
+	if err != nil {
+		return err
+	}
 
 	if err := m.Up(); err != nil {
 		if err != migrate.ErrNoChange {
