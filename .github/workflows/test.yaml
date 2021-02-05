@@ -1,0 +1,34 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        platform: [ubuntu-latest, macos-latest, windows-latest]
+
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Install golang
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.14.x
+
+      - uses: actions/checkout@v2
+
+      - name: generate swagger
+        run: |
+          go get -u github.com/swaggo/swag/cmd/swag
+          swag init -g ./internal/app/app.go -o ./docs/swagger
+
+      - name: generate mocks
+        run: |
+          GO111MODULE=on go get github.com/golang/mock/mockgen@v1.4.4
+          go generate ./...
+
+      - name: test
+        run: go test ./... -v
