@@ -20,6 +20,9 @@ jobs:
           go get -u github.com/swaggo/swag/cmd/swag
           swag init -g ./internal/app/app.go -o ./docs/swagger
 
+      - name: mocks generate
+        run: go generate ./...
+
       - name: lint
         run: |
           curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.26.0
