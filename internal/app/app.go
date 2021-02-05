@@ -16,6 +16,14 @@ import (
 	"github.com/aintsashqa/go-simple-blog/pkg/hash/bcrypt"
 )
 
+// @title Go Simple Blog API
+// @version 1.0.0
+// @BasePath /api/v1
+
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
+
 func Run() {
 	cfg, err := config.Init("config")
 	if err != nil {

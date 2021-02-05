@@ -136,6 +136,7 @@ type createPostResponse struct {
 // @Failure 400 {object} responseError
 // @Failure 401 {object} responseError
 // @Failure 500 {object} responseError
+// @Security ApiKeyAuth
 // @Router /post [post]
 func (h *Handler) createPost(w http.ResponseWriter, r *http.Request) {
 	var input createPostRequest
@@ -204,6 +205,7 @@ type updatePostResponse struct {
 // @Failure 400 {object} responseError
 // @Failure 401 {object} responseError
 // @Failure 500 {object} responseError
+// @Security ApiKeyAuth
 // @Router /post/{id} [put]
 func (h *Handler) updatePost(w http.ResponseWriter, r *http.Request) {
 	var input updatePostRequest
@@ -254,6 +256,7 @@ type publishPostResponse struct {
 // @Success 202 {object} publishPostResponse
 // @Failure 401 {object} responseError
 // @Failure 500 {object} responseError
+// @Security ApiKeyAuth
 // @Router /post/{id}/publish [get]
 func (h *Handler) publishPost(w http.ResponseWriter, r *http.Request) {
 	id := uuid.FromStringOrNil(chi.URLParam(r, "id"))

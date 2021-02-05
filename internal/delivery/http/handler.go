@@ -25,11 +25,6 @@ func NewHandler(services *service.Service) *Handler {
 	}
 }
 
-// @title Go Simple Blog API
-// @version 1.0
-// @license.name Apache 2.0
-// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
-
 func (h *Handler) Init(host string, port int) http.Handler {
 	r := chi.NewRouter()
 
@@ -45,9 +40,6 @@ func (h *Handler) Init(host string, port int) http.Handler {
 }
 
 func (h *Handler) swagger(r chi.Router, host string, port int) {
-	swagger.SwaggerInfo.Title = "Go Simple Blog API"
-	swagger.SwaggerInfo.Version = "1.0.0"
-	swagger.SwaggerInfo.BasePath = "/api/v1"
 	swagger.SwaggerInfo.Host = fmt.Sprintf("%s:%d", host, port)
 
 	r.Get("/swagger/*", httpSwagger.Handler(httpSwagger.URL("doc.json")))
