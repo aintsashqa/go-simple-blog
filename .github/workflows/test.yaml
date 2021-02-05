@@ -27,7 +27,7 @@ jobs:
 
       - name: generate mocks
         run: |
-          GO111MODULE=on go get github.com/golang/mock/mockgen@v1.4.4
+          go get -u github.com/golang/mock/mockgen@v1.4.4
           go generate ./...
 
       - name: test
