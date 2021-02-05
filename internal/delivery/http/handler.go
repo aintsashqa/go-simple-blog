@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/aintsashqa/go-simple-blog/docs/swagger"
-	_ "github.com/aintsashqa/go-simple-blog/docs/swagger"
 	v1 "github.com/aintsashqa/go-simple-blog/internal/delivery/http/v1"
 	"github.com/aintsashqa/go-simple-blog/internal/service"
 	"github.com/go-chi/chi"
