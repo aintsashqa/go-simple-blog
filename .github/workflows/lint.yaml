@@ -21,7 +21,9 @@ jobs:
           swag init -g ./internal/app/app.go -o ./docs/swagger
 
       - name: mocks generate
-        run: go generate ./...
+        run: |
+          GO111MODULE=on go get github.com/golang/mock/mockgen@v1.4.4
+          go generate ./...
 
       - name: lint
         run: |
