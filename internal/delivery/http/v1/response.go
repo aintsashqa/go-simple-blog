@@ -6,13 +6,22 @@ import (
 	"github.com/go-chi/render"
 )
 
+const (
+	internalErrorMsg             string = "Internal error"
+	validationFailedMsg          string = "Validation failed"
+	invalidUrlQueryParamErrorMsg string = "Invalid url query parameter `%s`"
+	authorizationFailedMsg       string = "Authorization failed"
+)
+
 type responseError struct {
-	Message string `json:"message"`
+	Message string   `json:"message"`
+	Errors  []string `json:"errors"`
 }
 
-func errorFn(w http.ResponseWriter, r *http.Request, status int, message string) {
+func errorFn(w http.ResponseWriter, r *http.Request, status int, message string, errors ...string) {
 	respond(w, r, status, responseError{
 		Message: message,
+		Errors:  errors,
 	})
 }
 

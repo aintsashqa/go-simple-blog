@@ -20,8 +20,15 @@ type signUpRequest struct {
 
 func (r *signUpRequest) Validate() error {
 	return validation.ValidateStruct(r,
-		validation.Field(&r.Email, validation.Required, validation.Length(5, 255), is.Email),
-		validation.Field(&r.Password, validation.Required, validation.Length(6, 255)),
+		validation.Field(&r.Email,
+			validation.Required,
+			validation.Length(5, 255),
+			is.Email,
+		),
+		validation.Field(&r.Password,
+			validation.Required,
+			validation.Length(6, 255),
+		),
 	)
 }
 
@@ -50,7 +57,7 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 
 	if err := input.Validate(); err != nil {
 		log.Print(err)
-		errorFn(w, r, http.StatusBadRequest, err.Error())
+		errorFn(w, r, http.StatusBadRequest, validationFailedMsg, strings.Split(err.Error(), "; ")...)
 		return
 	}
 
@@ -59,7 +66,7 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 		Password: input.Password,
 	}); err != nil {
 		log.Print(err)
-		errorFn(w, r, http.StatusInternalServerError, err.Error())
+		errorFn(w, r, http.StatusInternalServerError, internalErrorMsg, err.Error())
 		return
 	}
 
@@ -75,8 +82,15 @@ type signInRequest struct {
 
 func (r *signInRequest) Validate() error {
 	return validation.ValidateStruct(r,
-		validation.Field(&r.Email, validation.Required, validation.Length(5, 255), is.Email),
-		validation.Field(&r.Password, validation.Required, validation.Length(6, 255)),
+		validation.Field(&r.Email,
+			validation.Required,
+			validation.Length(5, 255),
+			is.Email,
+		),
+		validation.Field(&r.Password,
+			validation.Required,
+			validation.Length(6, 255),
+		),
 	)
 }
 
@@ -105,7 +119,7 @@ func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 
 	if err := input.Validate(); err != nil {
 		log.Print(err)
-		errorFn(w, r, http.StatusBadRequest, err.Error())
+		errorFn(w, r, http.StatusBadRequest, validationFailedMsg, strings.Split(err.Error(), "; ")...)
 		return
 	}
 
@@ -116,7 +130,7 @@ func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Print(err)
-		errorFn(w, r, http.StatusInternalServerError, err.Error())
+		errorFn(w, r, http.StatusInternalServerError, internalErrorMsg, err.Error())
 		return
 	}
 
@@ -130,14 +144,14 @@ func (h *Handler) authenticateMiddleware(next http.Handler) http.Handler {
 		header := r.Header.Get("Authorization")
 		if len(header) == 0 {
 			log.Print("header `Authorization` is empty")
-			errorFn(w, r, http.StatusUnauthorized, "header `Authorization` is empty")
+			errorFn(w, r, http.StatusUnauthorized, authorizationFailedMsg, "header `Authorization` is empty")
 			return
 		}
 
 		headerPieces := strings.Split(header, " ")
 		if len(headerPieces) != 2 {
 			log.Print("invalid `Authorization` header")
-			errorFn(w, r, http.StatusUnauthorized, "invalid `Authorization` header")
+			errorFn(w, r, http.StatusUnauthorized, authorizationFailedMsg, "invalid `Authorization` header")
 			return
 		}
 
@@ -146,13 +160,13 @@ func (h *Handler) authenticateMiddleware(next http.Handler) http.Handler {
 		})
 		if err != nil {
 			log.Print(err)
-			errorFn(w, r, http.StatusUnauthorized, err.Error())
+			errorFn(w, r, http.StatusUnauthorized, authorizationFailedMsg, err.Error())
 			return
 		}
 
 		if id == uuid.Nil {
 			log.Print("invalid user id")
-			errorFn(w, r, http.StatusUnauthorized, "invalid user id")
+			errorFn(w, r, http.StatusUnauthorized, authorizationFailedMsg, "invalid user id")
 			return
 		}
 

@@ -2,6 +2,7 @@ package v1
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -42,14 +43,14 @@ func (h *Handler) getAllPublishedPosts(w http.ResponseWriter, r *http.Request) {
 	currentPage, err := strconv.Atoi(r.URL.Query().Get("current_page"))
 	if err != nil {
 		log.Print(err)
-		errorFn(w, r, http.StatusBadRequest, err.Error())
+		errorFn(w, r, http.StatusBadRequest, fmt.Sprintf(invalidUrlQueryParamErrorMsg, "current_page"), err.Error())
 		return
 	}
 
 	postsPerPage, err := strconv.Atoi(r.URL.Query().Get("posts_per_page"))
 	if err != nil {
 		log.Print(err)
-		errorFn(w, r, http.StatusBadRequest, err.Error())
+		errorFn(w, r, http.StatusBadRequest, fmt.Sprintf(invalidUrlQueryParamErrorMsg, "posts_per_page"), err.Error())
 		return
 	}
 
@@ -62,7 +63,7 @@ func (h *Handler) getAllPublishedPosts(w http.ResponseWriter, r *http.Request) {
 	pagination, err := h.post.GetAllPublishedPaginate(r.Context(), opt)
 	if err != nil {
 		log.Print(err)
-		errorFn(w, r, http.StatusInternalServerError, err.Error())
+		errorFn(w, r, http.StatusInternalServerError, internalErrorMsg, err.Error())
 		return
 	}
 
@@ -96,7 +97,7 @@ func (h *Handler) getSinglePost(w http.ResponseWriter, r *http.Request) {
 	post, err := h.post.Find(r.Context(), id)
 	if err != nil {
 		log.Print(err)
-		errorFn(w, r, http.StatusInternalServerError, err.Error())
+		errorFn(w, r, http.StatusInternalServerError, internalErrorMsg, err.Error())
 		return
 	}
 
@@ -142,13 +143,13 @@ func (h *Handler) createPost(w http.ResponseWriter, r *http.Request) {
 	var input createPostRequest
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		log.Print(err)
-		errorFn(w, r, http.StatusInternalServerError, err.Error())
+		errorFn(w, r, http.StatusInternalServerError, internalErrorMsg, err.Error())
 		return
 	}
 
 	if err := input.Validate(); err != nil {
 		log.Print(err)
-		errorFn(w, r, http.StatusBadRequest, err.Error())
+		errorFn(w, r, http.StatusBadRequest, validationFailedMsg, err.Error())
 		return
 	}
 
@@ -164,7 +165,7 @@ func (h *Handler) createPost(w http.ResponseWriter, r *http.Request) {
 	post, err := h.post.Create(r.Context(), opt)
 	if err != nil {
 		log.Print(err)
-		errorFn(w, r, http.StatusInternalServerError, err.Error())
+		errorFn(w, r, http.StatusInternalServerError, internalErrorMsg, err.Error())
 		return
 	}
 
@@ -211,13 +212,13 @@ func (h *Handler) updatePost(w http.ResponseWriter, r *http.Request) {
 	var input updatePostRequest
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		log.Print(err)
-		errorFn(w, r, http.StatusInternalServerError, err.Error())
+		errorFn(w, r, http.StatusInternalServerError, internalErrorMsg, err.Error())
 		return
 	}
 
 	if err := input.Validate(); err != nil {
 		log.Print(err)
-		errorFn(w, r, http.StatusBadRequest, err.Error())
+		errorFn(w, r, http.StatusBadRequest, validationFailedMsg, err.Error())
 		return
 	}
 
@@ -233,7 +234,7 @@ func (h *Handler) updatePost(w http.ResponseWriter, r *http.Request) {
 	post, err := h.post.Update(r.Context(), opt)
 	if err != nil {
 		log.Print(err)
-		errorFn(w, r, http.StatusInternalServerError, err.Error())
+		errorFn(w, r, http.StatusInternalServerError, internalErrorMsg, err.Error())
 		return
 	}
 
@@ -262,7 +263,7 @@ func (h *Handler) publishPost(w http.ResponseWriter, r *http.Request) {
 	id := uuid.FromStringOrNil(chi.URLParam(r, "id"))
 	if err := h.post.Publish(r.Context(), id); err != nil {
 		log.Print(err)
-		errorFn(w, r, http.StatusInternalServerError, err.Error())
+		errorFn(w, r, http.StatusInternalServerError, internalErrorMsg, err.Error())
 		return
 	}
 
