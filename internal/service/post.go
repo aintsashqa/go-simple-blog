@@ -66,16 +66,13 @@ func (s *PostService) GetAllPublishedPaginate(ctx context.Context, opt Published
 
 func (s *PostService) Create(ctx context.Context, input CreatePostInput) (domain.Post, error) {
 	post := domain.Post{
-		ID:          uuid.NewV4(),
 		Title:       input.Title,
 		Slug:        input.Slug,
 		Content:     input.Content,
 		UserID:      input.UserID,
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
 		PublishedAt: null.NewTime(time.Now(), input.IsPublished),
-		DeletedAt:   null.NewTime(time.Now(), false),
 	}
+	post.Init()
 
 	err := s.repo.Create(ctx, post)
 	return post, err
@@ -90,8 +87,8 @@ func (s *PostService) Update(ctx context.Context, input UpdatePostInput) (domain
 	post.Title = input.Title
 	post.Slug = input.Slug
 	post.Content = input.Content
-	post.UpdatedAt = time.Now()
 	post.PublishedAt = null.NewTime(time.Now(), input.IsPublished)
+	post.Update()
 
 	if err := s.repo.Update(ctx, post); err != nil {
 		return domain.Post{}, err

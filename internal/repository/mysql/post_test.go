@@ -74,7 +74,9 @@ func (s *PostRepositorySuite) TestFindMethod() {
 			InputID:             id,
 			DatabaseResultError: nil,
 			MethodResultValue: domain.Post{
-				ID: id,
+				Model: domain.Model{
+					ID: id,
+				},
 			},
 			MethodResultError:            nil,
 			MockDatabasePrivoderBehavior: mockDatabasePrivoderBehavior,

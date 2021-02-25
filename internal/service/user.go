@@ -10,7 +10,6 @@ import (
 	"github.com/aintsashqa/go-simple-blog/pkg/auth"
 	"github.com/aintsashqa/go-simple-blog/pkg/hash"
 	uuid "github.com/satori/go.uuid"
-	"gopkg.in/guregu/null.v4"
 )
 
 type UserService struct {
@@ -31,14 +30,11 @@ func NewUserService(
 
 func (s *UserService) SignUp(ctx context.Context, input SignUpUserInput) error {
 	user := domain.User{
-		ID:        uuid.NewV4(),
-		Email:     input.Email,
-		Username:  fmt.Sprintf("Username%d", time.Now().Unix()),
-		Password:  s.hasher.Make(input.Password),
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-		DeletedAt: null.NewTime(time.Now(), false),
+		Email:    input.Email,
+		Username: fmt.Sprintf("Username%d", time.Now().Unix()),
+		Password: s.hasher.Make(input.Password),
 	}
+	user.Init()
 
 	return s.repo.Create(ctx, user)
 }

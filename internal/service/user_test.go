@@ -162,7 +162,6 @@ func (s *UserServiceSuite) TestSignInMethod() {
 				Password: "secret",
 			},
 			CurrentUser: domain.User{
-				ID:       uuid.NewV4(),
 				Password: "secret-hash",
 			},
 			AccessToken:           "access-token-valid",
@@ -184,7 +183,6 @@ func (s *UserServiceSuite) TestSignInMethod() {
 				Password: "secret",
 			},
 			CurrentUser: domain.User{
-				ID:       uuid.NewV4(),
 				Password: "secret-hash",
 			},
 			RepositoryResultError:      repositoryResultError,
@@ -203,7 +201,6 @@ func (s *UserServiceSuite) TestSignInMethod() {
 				Password: "secret1",
 			},
 			CurrentUser: domain.User{
-				ID:       uuid.NewV4(),
 				Password: "secret-hash",
 			},
 			RepositoryResultError:      nil,
@@ -222,7 +219,6 @@ func (s *UserServiceSuite) TestSignInMethod() {
 				Password: "secret",
 			},
 			CurrentUser: domain.User{
-				ID:       uuid.NewV4(),
 				Password: "secret-hash",
 			},
 			RepositoryResultError:      nil,
@@ -238,6 +234,7 @@ func (s *UserServiceSuite) TestSignInMethod() {
 
 	for _, currentCase := range methodCases {
 		s.Suite.Run(currentCase.Name, func() {
+			currentCase.CurrentUser.Init()
 			if currentCase.MockUserRepositoryBehavior != nil {
 				currentCase.MockUserRepositoryBehavior(s.MockUserRepository, currentCase.ServiceInput, currentCase.CurrentUser, currentCase.RepositoryResultError)
 			}
