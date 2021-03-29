@@ -1,7 +1,6 @@
 package http
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/aintsashqa/go-simple-blog/docs/swagger"
@@ -39,7 +38,8 @@ func (h *Handler) Init(host string, port int) http.Handler {
 }
 
 func (h *Handler) swagger(r chi.Router, host string, port int) {
-	swagger.SwaggerInfo.Host = fmt.Sprintf("%s:%d", host, port)
+	// swagger.SwaggerInfo.Host = fmt.Sprintf("%s:%d", host, port)
+	swagger.SwaggerInfo.Host = "localhost:80"
 
 	r.Get("/swagger/*", httpSwagger.Handler(httpSwagger.URL("doc.json")))
 }

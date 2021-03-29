@@ -1,0 +1,9 @@
+.github/
+# migrations/
+tmp/
+vendor/
+
+Dockerfile
+docker-compose.*yml
+docker-compose.*yaml
+Makefile
