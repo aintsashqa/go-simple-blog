@@ -10,7 +10,7 @@ db:
   port: 3306
   username: root
   password: root
-  db_name: dev-simple-blog
+  name: dev-simple-blog
   charset: utf8
 
 auth:
