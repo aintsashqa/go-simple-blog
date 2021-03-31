@@ -13,6 +13,7 @@ services:
         restart: always
         links: 
             - mysql
+            - redis
 
     mysql:
         image: mysql:5.7
@@ -21,3 +22,12 @@ services:
         environment: 
             - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
             - MYSQL_DATABASE=${DB_NAME}
+
+    redis:
+        image: bitnami/redis
+        volumes: 
+            - ./tmp/redis:/data
+        ports: 
+            - ${CACHE_PORT}:6379
+        environment: 
+            - ALLOW_EMPTY_PASSWORD=yes

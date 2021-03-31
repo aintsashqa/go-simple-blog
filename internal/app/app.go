@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"log"
 	"os"
 	"os/signal"
@@ -12,6 +13,7 @@ import (
 	"github.com/aintsashqa/go-simple-blog/internal/server"
 	"github.com/aintsashqa/go-simple-blog/internal/service"
 	"github.com/aintsashqa/go-simple-blog/pkg/auth/jwt"
+	"github.com/aintsashqa/go-simple-blog/pkg/cache/redis"
 	"github.com/aintsashqa/go-simple-blog/pkg/database/mysql"
 	"github.com/aintsashqa/go-simple-blog/pkg/hash/bcrypt"
 )
@@ -25,6 +27,8 @@ import (
 // @name Authorization
 
 func Run() {
+	ctx := context.Background()
+
 	cfg, err := config.Init("config")
 	if err != nil {
 		log.Fatal(err)
@@ -42,6 +46,17 @@ func Run() {
 		log.Fatal(err)
 	}
 
+	cache, err := redis.NewRedisProvider(ctx, redis.Config{
+		Host:     cfg.Cache.Host,
+		Port:     cfg.Cache.Port,
+		Username: cfg.Cache.Username,
+		Password: cfg.Cache.Password,
+		Database: cfg.Cache.Database,
+	}, cfg.Cache.Expires)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	repos := repository.NewRepository(database)
 	hasher := bcrypt.NewBcryptProvider()
 	auth := jwt.NewJWTAuthorizationProvider(cfg.Auth.JWTSigningKey)
@@ -51,6 +66,7 @@ func Run() {
 		Hasher:                        hasher,
 		Authorization:                 auth,
 		AuthorizationTokenExpiresTime: cfg.Auth.JWTExpiresTime,
+		Cache:                         cache,
 	})
 
 	handler := http.NewHandler(services)

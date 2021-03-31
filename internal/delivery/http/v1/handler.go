@@ -2,16 +2,18 @@ package v1
 
 import (
 	"github.com/aintsashqa/go-simple-blog/internal/service"
+	"github.com/aintsashqa/go-simple-blog/pkg/cache"
 	"github.com/go-chi/chi"
 )
 
 type Handler struct {
-	user service.User
-	post service.Post
+	user  service.User
+	post  service.Post
+	cache cache.CachePrivoder
 }
 
-func NewHandler(user service.User, post service.Post) *Handler {
-	return &Handler{user: user, post: post}
+func NewHandler(user service.User, post service.Post, cache cache.CachePrivoder) *Handler {
+	return &Handler{user: user, post: post, cache: cache}
 }
 
 func (h *Handler) Init(r chi.Router) {

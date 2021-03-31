@@ -14,6 +14,11 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
+const (
+	GetAllPublishedPostsCacheKey string = "get-all-published-posts[current-page=%d;posts-per-page=%d;user-id=%s]"
+	GetSinglePostCacheKey        string = "get-single-post[id=%s]"
+)
+
 type getAllPublishedPostsResponseMetadata struct {
 	PreviousPage int `json:"previous_page"`
 	CurrentPage  int `json:"current_page"`
@@ -54,28 +59,47 @@ func (h *Handler) getAllPublishedPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	opt := service.PublishedPostsOptions{
-		UserID:       uuid.FromStringOrNil(r.URL.Query().Get("user_id")),
-		CurrentPage:  currentPage,
-		PostsPerPage: postsPerPage,
-	}
+	userID := uuid.FromStringOrNil(r.URL.Query().Get("user_id"))
 
-	pagination, err := h.post.GetAllPublishedPaginate(r.Context(), opt)
+	var response getAllPublishedPostsResponse
+	currentCacheKey := fmt.Sprintf(GetAllPublishedPostsCacheKey, currentPage, postsPerPage, userID)
+
+	founded, err := h.getFromCache(r.Context(), currentCacheKey, &response)
 	if err != nil {
 		log.Print(err)
-		errorFn(w, r, http.StatusInternalServerError, internalErrorMsg, err.Error())
+		errorFn(w, r, http.StatusBadRequest, internalErrorMsg, err.Error())
 		return
 	}
 
-	respond(w, r, http.StatusOK, getAllPublishedPostsResponse{
-		Posts: pagination.Posts,
-		Metadata: getAllPublishedPostsResponseMetadata{
-			PreviousPage: pagination.PreviousPage,
-			CurrentPage:  pagination.CurrentPage,
-			NextPage:     pagination.NextPage,
-			PostsPerPage: pagination.PostsPerPage,
-		},
-	})
+	if !founded {
+
+		opt := service.PublishedPostsOptions{
+			UserID:       userID,
+			CurrentPage:  currentPage,
+			PostsPerPage: postsPerPage,
+		}
+
+		pagination, err := h.post.GetAllPublishedPaginate(r.Context(), opt)
+		if err != nil {
+			log.Print(err)
+			errorFn(w, r, http.StatusInternalServerError, internalErrorMsg, err.Error())
+			return
+		}
+
+		response = getAllPublishedPostsResponse{
+			Posts: pagination.Posts,
+			Metadata: getAllPublishedPostsResponseMetadata{
+				PreviousPage: pagination.PreviousPage,
+				CurrentPage:  pagination.CurrentPage,
+				NextPage:     pagination.NextPage,
+				PostsPerPage: pagination.PostsPerPage,
+			},
+		}
+
+		h.saveToCache(r.Context(), currentCacheKey, response)
+	}
+
+	respond(w, r, http.StatusOK, response)
 }
 
 type getSinglePostResponse struct {
@@ -94,16 +118,34 @@ type getSinglePostResponse struct {
 // @Router /post/{id} [get]
 func (h *Handler) getSinglePost(w http.ResponseWriter, r *http.Request) {
 	id := uuid.FromStringOrNil(chi.URLParam(r, "id"))
-	post, err := h.post.Find(r.Context(), id)
+
+	var response getSinglePostResponse
+	currentCacheKey := fmt.Sprintf(GetSinglePostCacheKey, id)
+
+	founded, err := h.getFromCache(r.Context(), currentCacheKey, &response)
 	if err != nil {
 		log.Print(err)
 		errorFn(w, r, http.StatusInternalServerError, internalErrorMsg, err.Error())
 		return
 	}
 
-	respond(w, r, http.StatusOK, getSinglePostResponse{
-		Post: post,
-	})
+	if !founded {
+
+		post, err := h.post.Find(r.Context(), id)
+		if err != nil {
+			log.Print(err)
+			errorFn(w, r, http.StatusInternalServerError, internalErrorMsg, err.Error())
+			return
+		}
+
+		response = getSinglePostResponse{
+			Post: post,
+		}
+
+		h.saveToCache(r.Context(), currentCacheKey, response)
+	}
+
+	respond(w, r, http.StatusOK, response)
 }
 
 type createPostRequest struct {

@@ -12,6 +12,7 @@ type (
 		App      AppConfig           `mapstructure:"app"`
 		Database MySQLDatabaseConfig `mapstructure:"db"`
 		Auth     AuthorizationConfig `mapstructure:"auth"`
+		Cache    CacheConfig         `mapstructure:"cache"`
 	}
 
 	AppConfig struct {
@@ -34,6 +35,15 @@ type (
 	AuthorizationConfig struct {
 		JWTSigningKey  string        `mapstructure:"jwt_signing_key"`
 		JWTExpiresTime time.Duration `mapstructure:"jwt_expires_time"`
+	}
+
+	CacheConfig struct {
+		Host     string        `mapstructure:"host"`
+		Port     int           `mapstructure:"port"`
+		Username string        `mapstructure:"username"`
+		Password string        `mapstructure:"password"`
+		Database int           `mapstructure:"database"`
+		Expires  time.Duration `mapstructure:"expires"`
 	}
 )
 
