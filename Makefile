@@ -14,3 +14,9 @@ mock-gen:
 
 tests: mock-gen
 	go test ./... -v
+
+dstop:
+	docker-compose -f "docker-compose.yml" down
+
+dstart: dstop
+	docker-compose -f "docker-compose.yml" up -d --build
