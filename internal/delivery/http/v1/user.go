@@ -3,14 +3,21 @@ package v1
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
 
+	"github.com/aintsashqa/go-simple-blog/internal/domain"
 	"github.com/aintsashqa/go-simple-blog/internal/service"
+	"github.com/go-chi/chi"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
 	uuid "github.com/satori/go.uuid"
+)
+
+const (
+	GetSingleUserCacheKey string = "get-single-user[id=%s]"
 )
 
 type signUpRequest struct {
@@ -136,6 +143,120 @@ func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 
 	respond(w, r, http.StatusOK, signInResponse{
 		AccessToken: tokens.AccessToken,
+	})
+}
+
+type getSingleUserResponse struct {
+	User domain.User `json:"user"`
+}
+
+// @Summary Get single user
+// @Description Get single user by id
+// @ID user-get-single
+// @Tags User
+// @Accept json
+// @Produce json
+// @Param id path string string "User with id"
+// @Success 200 {object} getSingleUserResponse
+// @Failure 500 {object} responseError
+// @Router /user/{id} [get]
+func (h *Handler) getSingleUser(w http.ResponseWriter, r *http.Request) {
+	id := uuid.FromStringOrNil(chi.URLParam(r, "id"))
+
+	var response getSingleUserResponse
+	currentCacheKey := fmt.Sprintf(GetSingleUserCacheKey, id)
+
+	founded, err := h.getFromCache(r.Context(), currentCacheKey, &response)
+	if err != nil {
+		log.Print(err)
+		errorFn(w, r, http.StatusInternalServerError, internalErrorMsg, err.Error())
+		return
+	}
+
+	if !founded {
+
+		user, err := h.user.Find(r.Context(), id)
+		if err != nil {
+			log.Print(err)
+			errorFn(w, r, http.StatusInternalServerError, internalErrorMsg, err.Error())
+			return
+		}
+
+		response = getSingleUserResponse{
+			User: user,
+		}
+
+		h.saveToCache(r.Context(), currentCacheKey, response)
+	}
+
+	respond(w, r, http.StatusOK, response)
+}
+
+type updateUserRequest struct {
+	Username string `json:"username"`
+}
+
+func (r *updateUserRequest) Validate() error {
+	return validation.ValidateStruct(r,
+		validation.Field(&r.Username, validation.Required, validation.Length(6, 255)),
+	)
+}
+
+type updateUserResponse struct {
+	User domain.User `json:"user"`
+}
+
+// @Summary Update user
+// @Description Update user with id
+// @ID user-update
+// @Tags User
+// @Accept json
+// @Produce json
+// @Param id path string true "User with id"
+// @Param payload body updateUserRequest true "User details"
+// @Success 202 {object} updateUserResponse
+// @Failure 400 {object} responseError
+// @Failure 401 {object} responseError
+// @Failure 403 {object} responseError
+// @Failure 500 {object} responseError
+// @Security ApiKeyAuth
+// @Router /user/{id} [put]
+func (h *Handler) updateUser(w http.ResponseWriter, r *http.Request) {
+	var input updateUserRequest
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		log.Print(err)
+		errorFn(w, r, http.StatusInternalServerError, internalErrorMsg, err.Error())
+		return
+	}
+
+	if err := input.Validate(); err != nil {
+		log.Print(err)
+		errorFn(w, r, http.StatusBadRequest, validationFailedMsg, err.Error())
+		return
+	}
+
+	authorizedUserID := r.Context().Value("user_id").(uuid.UUID)
+	id := uuid.FromStringOrNil(chi.URLParam(r, "id"))
+	if authorizedUserID != id {
+		log.Print("invalid authorized user")
+		errorFn(w, r, http.StatusForbidden, authorizationFailedMsg, "invalid authorized user")
+		return
+	}
+
+	opt := service.UpdateUserInput{
+		ID:       id,
+		Username: input.Username,
+	}
+
+	user, err := h.user.Update(r.Context(), opt)
+	if err != nil {
+		log.Print(err)
+		errorFn(w, r, http.StatusInternalServerError, internalErrorMsg, err.Error())
+		return
+	}
+
+	respond(w, r, http.StatusAccepted, updateUserResponse{
+		User: user,
 	})
 }
 

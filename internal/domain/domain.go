@@ -17,9 +17,9 @@ type (
 
 	User struct {
 		Model
-		Email    string `json:"email"        db:"email"`
-		Username string `json:"username"     db:"username"`
-		Password string `json:"-"            db:"encrypted_password"`
+		Email    string `json:"email,omitempty"    db:"email"`
+		Username string `json:"username"           db:"username"`
+		Password string `json:"-"                  db:"encrypted_password"`
 	}
 
 	Post struct {

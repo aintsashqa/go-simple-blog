@@ -31,10 +31,17 @@ type (
 		Token string
 	}
 
+	UpdateUserInput struct {
+		ID       uuid.UUID
+		Username string
+	}
+
 	User interface {
 		SignUp(context.Context, SignUpUserInput) error
 		SignIn(context.Context, SignInUserInput) (Tokens, error)
 		Authenticate(context.Context, AuthenticateUserInput) (uuid.UUID, error)
+		Find(context.Context, uuid.UUID) (domain.User, error)
+		Update(context.Context, UpdateUserInput) (domain.User, error)
 	}
 
 	CreatePostInput struct {

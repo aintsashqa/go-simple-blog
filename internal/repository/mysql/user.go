@@ -6,6 +6,7 @@ import (
 
 	"github.com/aintsashqa/go-simple-blog/internal/domain"
 	"github.com/aintsashqa/go-simple-blog/pkg/database"
+	uuid "github.com/satori/go.uuid"
 )
 
 type UserRepos struct {
@@ -26,4 +27,16 @@ func (r *UserRepos) GetByEmail(ctx context.Context, email string) (domain.User, 
 	query := fmt.Sprintf("select * from %s where (email = ? and deleted_at is null)", usersTable)
 	err := r.database.Get(ctx, &user, query, email)
 	return user, err
+}
+
+func (r *UserRepos) Find(ctx context.Context, id uuid.UUID) (domain.User, error) {
+	var user domain.User
+	query := fmt.Sprintf("select id, username, created_at, updated_at from %s where (id = ? and deleted_at is null)", usersTable)
+	err := r.database.Get(ctx, &user, query, id)
+	return user, err
+}
+
+func (r *UserRepos) Update(ctx context.Context, user domain.User) error {
+	query := fmt.Sprintf("update %s set username = ?, updated_at = ? where (id = ? and deleted_at is null)", usersTable)
+	return r.database.Exec(ctx, query, user.Username, user.UpdatedAt, user.ID)
 }

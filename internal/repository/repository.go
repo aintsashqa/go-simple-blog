@@ -15,6 +15,8 @@ type (
 	User interface {
 		Create(context.Context, domain.User) error
 		GetByEmail(context.Context, string) (domain.User, error)
+		Find(context.Context, uuid.UUID) (domain.User, error)
+		Update(context.Context, domain.User) error
 	}
 
 	Post interface {

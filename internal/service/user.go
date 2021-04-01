@@ -57,6 +57,26 @@ func (s *UserService) SignIn(ctx context.Context, input SignInUserInput) (Tokens
 	return Tokens{AccessToken: accessToken}, err
 }
 
+func (s *UserService) Find(ctx context.Context, id uuid.UUID) (domain.User, error) {
+	return s.repo.Find(ctx, id)
+}
+
+func (s *UserService) Update(ctx context.Context, input UpdateUserInput) (domain.User, error) {
+	user, err := s.repo.Find(ctx, input.ID)
+	if err != nil {
+		return domain.User{}, err
+	}
+
+	user.Username = input.Username
+	user.Update()
+
+	if err := s.repo.Update(ctx, user); err != nil {
+		return domain.User{}, err
+	}
+
+	return user, nil
+}
+
 func (s *UserService) Authenticate(ctx context.Context, input AuthenticateUserInput) (uuid.UUID, error) {
 	return s.auth.Parse(input.Token)
 }
