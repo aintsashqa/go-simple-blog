@@ -22,6 +22,8 @@ type PostPaginationResponseDto struct {
 }
 
 func (dto *PostPaginationResponseDto) TransformFromObject(posts service.PublishedPostsPagination) {
+	dto.Posts = []PostResponseDto{}
+
 	for _, post := range posts.Posts {
 		temp := PostResponseDto{}
 		temp.TransformFromObject(post)
