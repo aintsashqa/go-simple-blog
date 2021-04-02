@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -11,11 +10,6 @@ import (
 	repoerrors "github.com/aintsashqa/go-simple-blog/internal/repository/errors"
 	"github.com/go-chi/chi"
 	uuid "github.com/satori/go.uuid"
-)
-
-const (
-	GetAllPublishedPostsCacheKey string = "get-all-published-posts[current-page=%d;posts-per-page=%d;user-id=%s]"
-	GetSinglePostCacheKey        string = "get-single-post[id=%s]"
 )
 
 // @Summary Get all published
@@ -36,9 +30,8 @@ func (h *Handler) getAllPublishedPosts(w http.ResponseWriter, r *http.Request) {
 
 	request.FromRequest(r)
 
-	currentCacheKey := fmt.Sprintf(GetAllPublishedPostsCacheKey, request.CurrentPage, request.CountPerPage, request.UserID)
-
-	founded, err := h.getFromCache(r.Context(), currentCacheKey, &response)
+	opt := request.TransformToObject()
+	pagination, err := h.post.GetAllPublishedPaginate(r.Context(), opt)
 	if err != nil {
 
 		log.Print(err)
@@ -49,24 +42,7 @@ func (h *Handler) getAllPublishedPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if !founded {
-
-		opt := request.TransformToObject()
-		pagination, err := h.post.GetAllPublishedPaginate(r.Context(), opt)
-		if err != nil {
-
-			log.Print(err)
-
-			errorResp := responsedto.NewErrorResponseDto(http.StatusInternalServerError, errors.ErrInternal.Error())
-			errorRespond(w, r, errorResp)
-
-			return
-		}
-
-		response.TransformFromObject(pagination)
-		h.saveToCache(r.Context(), currentCacheKey, response)
-	}
-
+	response.TransformFromObject(pagination)
 	respond(w, r, http.StatusOK, response)
 }
 
@@ -85,42 +61,25 @@ func (h *Handler) getSinglePost(w http.ResponseWriter, r *http.Request) {
 	response := responsedto.PostResponseDto{}
 
 	id := uuid.FromStringOrNil(chi.URLParam(r, "id"))
-	currentCacheKey := fmt.Sprintf(GetSinglePostCacheKey, id)
 
-	founded, err := h.getFromCache(r.Context(), currentCacheKey, &response)
+	post, err := h.post.Find(r.Context(), id)
 	if err != nil {
 
 		log.Print(err)
 
-		errorResp := responsedto.NewErrorResponseDto(http.StatusInternalServerError, errors.ErrInternal.Error())
+		var errorResp responsedto.ErrorResponseDto
+		if err == repoerrors.ErrPostNotFound {
+			errorResp = responsedto.NewErrorResponseDto(http.StatusNotFound, err.Error())
+		} else {
+			errorResp = responsedto.NewErrorResponseDto(http.StatusInternalServerError, errors.ErrInternal.Error())
+		}
+
 		errorRespond(w, r, errorResp)
 
 		return
 	}
 
-	if !founded {
-
-		post, err := h.post.Find(r.Context(), id)
-		if err != nil {
-
-			log.Print(err)
-
-			var errorResp responsedto.ErrorResponseDto
-			if err == repoerrors.ErrPostNotFound {
-				errorResp = responsedto.NewErrorResponseDto(http.StatusNotFound, err.Error())
-			} else {
-				errorResp = responsedto.NewErrorResponseDto(http.StatusInternalServerError, errors.ErrInternal.Error())
-			}
-
-			errorRespond(w, r, errorResp)
-
-			return
-		}
-
-		response.TransformFromObject(post)
-		h.saveToCache(r.Context(), currentCacheKey, response)
-	}
-
+	response.TransformFromObject(post)
 	respond(w, r, http.StatusOK, response)
 }
 

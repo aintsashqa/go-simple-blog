@@ -2,7 +2,6 @@ package v1
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -14,10 +13,6 @@ import (
 	"github.com/aintsashqa/go-simple-blog/internal/service"
 	"github.com/go-chi/chi"
 	uuid "github.com/satori/go.uuid"
-)
-
-const (
-	GetSingleUserCacheKey string = "get-single-user[id=%s]"
 )
 
 // @Summary Sign up
@@ -124,42 +119,24 @@ func (h *Handler) getSingleUser(w http.ResponseWriter, r *http.Request) {
 	response := responsedto.UserResponseDto{}
 
 	id := uuid.FromStringOrNil(chi.URLParam(r, "id"))
-	currentCacheKey := fmt.Sprintf(GetSingleUserCacheKey, id)
-
-	founded, err := h.getFromCache(r.Context(), currentCacheKey, &response)
+	user, err := h.user.Find(r.Context(), id)
 	if err != nil {
 
 		log.Print(err)
 
-		errorResp := responsedto.NewErrorResponseDto(http.StatusInternalServerError, errors.ErrInternal.Error())
+		var errorResp responsedto.ErrorResponseDto
+		if err == repoerrors.ErrUserNotFound {
+			errorResp = responsedto.NewErrorResponseDto(http.StatusNotFound, err.Error())
+		} else {
+			errorResp = responsedto.NewErrorResponseDto(http.StatusInternalServerError, errors.ErrInternal.Error())
+		}
+
 		errorRespond(w, r, errorResp)
 
 		return
 	}
 
-	if !founded {
-
-		user, err := h.user.Find(r.Context(), id)
-		if err != nil {
-
-			log.Print(err)
-
-			var errorResp responsedto.ErrorResponseDto
-			if err == repoerrors.ErrUserNotFound {
-				errorResp = responsedto.NewErrorResponseDto(http.StatusNotFound, err.Error())
-			} else {
-				errorResp = responsedto.NewErrorResponseDto(http.StatusInternalServerError, errors.ErrInternal.Error())
-			}
-
-			errorRespond(w, r, errorResp)
-
-			return
-		}
-
-		response.TransformFromObject(user)
-		h.saveToCache(r.Context(), currentCacheKey, response)
-	}
-
+	response.TransformFromObject(user)
 	respond(w, r, http.StatusOK, response)
 }
 

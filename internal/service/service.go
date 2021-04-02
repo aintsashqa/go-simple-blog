@@ -7,7 +7,6 @@ import (
 	"github.com/aintsashqa/go-simple-blog/internal/domain"
 	"github.com/aintsashqa/go-simple-blog/internal/repository"
 	"github.com/aintsashqa/go-simple-blog/pkg/auth"
-	"github.com/aintsashqa/go-simple-blog/pkg/cache"
 	"github.com/aintsashqa/go-simple-blog/pkg/hash"
 	uuid "github.com/satori/go.uuid"
 )
@@ -86,7 +85,6 @@ type (
 	Service struct {
 		User
 		Post
-		Cache cache.CachePrivoder
 	}
 
 	DataProvider interface {
@@ -96,7 +94,6 @@ type (
 
 	ServiceDependencies struct {
 		DataProvider                  DataProvider
-		Cache                         cache.CachePrivoder
 		Hasher                        hash.HashProvider
 		Authorization                 auth.AuthorizationProvider
 		AuthorizationTokenExpiresTime time.Duration
@@ -105,8 +102,7 @@ type (
 
 func NewService(deps ServiceDependencies) *Service {
 	return &Service{
-		User:  NewUserService(deps.DataProvider.UserProvider(), deps.Hasher, deps.Authorization, deps.AuthorizationTokenExpiresTime),
-		Post:  NewPostService(deps.DataProvider.PostProvider()),
-		Cache: deps.Cache,
+		User: NewUserService(deps.DataProvider.UserProvider(), deps.Hasher, deps.Authorization, deps.AuthorizationTokenExpiresTime),
+		Post: NewPostService(deps.DataProvider.PostProvider()),
 	}
 }

@@ -6,23 +6,20 @@ import (
 	"github.com/aintsashqa/go-simple-blog/docs/swagger"
 	v1 "github.com/aintsashqa/go-simple-blog/internal/delivery/http/v1"
 	"github.com/aintsashqa/go-simple-blog/internal/service"
-	"github.com/aintsashqa/go-simple-blog/pkg/cache"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 type Handler struct {
-	user  service.User
-	post  service.Post
-	cache cache.CachePrivoder
+	user service.User
+	post service.Post
 }
 
 func NewHandler(services *service.Service) *Handler {
 	return &Handler{
-		user:  services.User,
-		post:  services.Post,
-		cache: services.Cache,
+		user: services.User,
+		post: services.Post,
 	}
 }
 
@@ -48,7 +45,7 @@ func (h *Handler) swagger(r chi.Router, host string, port int) {
 }
 
 func (h *Handler) api(r chi.Router) {
-	version1 := v1.NewHandler(h.user, h.post, h.cache)
+	version1 := v1.NewHandler(h.user, h.post)
 
 	r.Route("/api", func(r chi.Router) {
 		version1.Init(r)

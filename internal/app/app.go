@@ -10,8 +10,10 @@ import (
 	"github.com/aintsashqa/go-simple-blog/internal/config"
 	"github.com/aintsashqa/go-simple-blog/internal/delivery/http"
 	"github.com/aintsashqa/go-simple-blog/internal/repository"
+	"github.com/aintsashqa/go-simple-blog/internal/serializer"
 	"github.com/aintsashqa/go-simple-blog/internal/server"
 	"github.com/aintsashqa/go-simple-blog/internal/service"
+	"github.com/aintsashqa/go-simple-blog/internal/store"
 	"github.com/aintsashqa/go-simple-blog/pkg/auth/jwt"
 	"github.com/aintsashqa/go-simple-blog/pkg/cache/redis"
 	"github.com/aintsashqa/go-simple-blog/pkg/database/mysql"
@@ -58,15 +60,16 @@ func Run() {
 	}
 
 	repos := repository.NewRepository(database)
+	serializer := serializer.NewSerializer()
+	store := store.NewCacheStore(repos, cache, serializer)
 	hasher := bcrypt.NewBcryptProvider()
 	auth := jwt.NewJWTAuthorizationProvider(cfg.Auth.JWTSigningKey)
 
 	services := service.NewService(service.ServiceDependencies{
-		DataProvider:                  repos,
+		DataProvider:                  store,
 		Hasher:                        hasher,
 		Authorization:                 auth,
 		AuthorizationTokenExpiresTime: cfg.Auth.JWTExpiresTime,
-		Cache:                         cache,
 	})
 
 	handler := http.NewHandler(services)
