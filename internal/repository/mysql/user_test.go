@@ -2,11 +2,13 @@ package mysql_test
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"testing"
 
 	"github.com/aintsashqa/go-simple-blog/internal/domain"
 	"github.com/aintsashqa/go-simple-blog/internal/repository"
+	repoerror "github.com/aintsashqa/go-simple-blog/internal/repository/errors"
 	"github.com/aintsashqa/go-simple-blog/internal/repository/mysql"
 	mock_database "github.com/aintsashqa/go-simple-blog/pkg/database/mocks"
 	"github.com/golang/mock/gomock"
@@ -125,12 +127,18 @@ func (s *UserRepositorySuite) TestGetByEmailMethod() {
 			MockDatabasePrivoderBehavior: mockDatabasePrivoderBehavior,
 		},
 		{
-			Name:                "DatabaseFailure",
-			InputEmail:          "test@example.com",
-			DatabaseResultError: databaseResultError,
-			MethodResultValue: domain.User{
-				Email: "test@example.com",
-			},
+			Name:                         "NotFound",
+			InputEmail:                   "",
+			DatabaseResultError:          sql.ErrNoRows,
+			MethodResultValue:            domain.User{},
+			MethodResultError:            repoerror.ErrUserNotFound,
+			MockDatabasePrivoderBehavior: mockDatabasePrivoderBehavior,
+		},
+		{
+			Name:                         "DatabaseFailure",
+			InputEmail:                   "",
+			DatabaseResultError:          databaseResultError,
+			MethodResultValue:            domain.User{},
 			MethodResultError:            databaseResultError,
 			MockDatabasePrivoderBehavior: mockDatabasePrivoderBehavior,
 		},

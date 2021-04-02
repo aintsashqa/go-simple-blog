@@ -2,9 +2,11 @@ package mysql
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 
 	"github.com/aintsashqa/go-simple-blog/internal/domain"
+	"github.com/aintsashqa/go-simple-blog/internal/repository/errors"
 	"github.com/aintsashqa/go-simple-blog/pkg/database"
 	uuid "github.com/satori/go.uuid"
 )
@@ -21,6 +23,9 @@ func (r *PostRepos) Find(ctx context.Context, id uuid.UUID) (domain.Post, error)
 	var post domain.Post
 	query := fmt.Sprintf("select * from %s where (id = ? and deleted_at is null)", postsTable)
 	err := r.database.Get(ctx, &post, query, id)
+	if err == sql.ErrNoRows {
+		return post, errors.ErrPostNotFound
+	}
 	return post, err
 }
 
@@ -58,10 +63,18 @@ func (r *PostRepos) Create(ctx context.Context, post domain.Post) error {
 
 func (r *PostRepos) Update(ctx context.Context, post domain.Post) error {
 	query := fmt.Sprintf("update %s set title = ?, slug = ?, content = ?, updated_at = ?, published_at = ? where (id = ? and deleted_at is null)", postsTable)
-	return r.database.Exec(ctx, query, post.Title, post.Slug, post.Content, post.UpdatedAt, post.PublishedAt, post.ID)
+	err := r.database.Exec(ctx, query, post.Title, post.Slug, post.Content, post.UpdatedAt, post.PublishedAt, post.ID)
+	if err == sql.ErrNoRows {
+		return errors.ErrPostNotFound
+	}
+	return err
 }
 
 func (r *PostRepos) Publish(ctx context.Context, post domain.Post) error {
 	query := fmt.Sprintf("update %s set published_at = ?, updated_at = ? where (id = ? and deleted_at is null)", postsTable)
-	return r.database.Exec(ctx, query, post.PublishedAt, post.UpdatedAt, post.ID)
+	err := r.database.Exec(ctx, query, post.PublishedAt, post.UpdatedAt, post.ID)
+	if err == sql.ErrNoRows {
+		return errors.ErrPostNotFound
+	}
+	return err
 }

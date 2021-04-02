@@ -8,6 +8,7 @@ import (
 	"github.com/aintsashqa/go-simple-blog/internal/delivery/http/v1/errors"
 	requsetdto "github.com/aintsashqa/go-simple-blog/internal/delivery/http/v1/request"
 	responsedto "github.com/aintsashqa/go-simple-blog/internal/delivery/http/v1/response"
+	repoerrors "github.com/aintsashqa/go-simple-blog/internal/repository/errors"
 	"github.com/go-chi/chi"
 	uuid "github.com/satori/go.uuid"
 )
@@ -77,6 +78,7 @@ func (h *Handler) getAllPublishedPosts(w http.ResponseWriter, r *http.Request) {
 // @Produce json
 // @Param id path string string "Post with id"
 // @Success 200 {object} response.PostResponseDto
+// @Failure 404 {object} response.ErrorResponseDto
 // @Failure 500 {object} response.ErrorResponseDto
 // @Router /post/{id} [get]
 func (h *Handler) getSinglePost(w http.ResponseWriter, r *http.Request) {
@@ -103,8 +105,13 @@ func (h *Handler) getSinglePost(w http.ResponseWriter, r *http.Request) {
 
 			log.Print(err)
 
-			// TODO: check sql.ErrNoRows to send StatusNotFound
-			errorResp := responsedto.NewErrorResponseDto(http.StatusInternalServerError, errors.ErrInternal.Error())
+			var errorResp responsedto.ErrorResponseDto
+			if err == repoerrors.ErrPostNotFound {
+				errorResp = responsedto.NewErrorResponseDto(http.StatusNotFound, err.Error())
+			} else {
+				errorResp = responsedto.NewErrorResponseDto(http.StatusInternalServerError, errors.ErrInternal.Error())
+			}
+
 			errorRespond(w, r, errorResp)
 
 			return
@@ -171,6 +178,7 @@ func (h *Handler) createPost(w http.ResponseWriter, r *http.Request) {
 // @Success 202 {object} response.PostResponseDto
 // @Failure 400 {object} response.ErrorResponseDto
 // @Failure 401 {object} response.ErrorResponseDto
+// @Failure 404 {object} response.ErrorResponseDto
 // @Failure 500 {object} response.ErrorResponseDto
 // @Security ApiKeyAuth
 // @Router /post/{id} [put]
@@ -193,8 +201,13 @@ func (h *Handler) updatePost(w http.ResponseWriter, r *http.Request) {
 
 		log.Print(err)
 
-		// TODO: check sql.ErrNoRows to send StatusNotFound
-		errorResp := responsedto.NewErrorResponseDto(http.StatusInternalServerError, errors.ErrInternal.Error())
+		var errorResp responsedto.ErrorResponseDto
+		if err == repoerrors.ErrPostNotFound {
+			errorResp = responsedto.NewErrorResponseDto(http.StatusNotFound, err.Error())
+		} else {
+			errorResp = responsedto.NewErrorResponseDto(http.StatusInternalServerError, errors.ErrInternal.Error())
+		}
+
 		errorRespond(w, r, errorResp)
 
 		return
@@ -213,6 +226,7 @@ func (h *Handler) updatePost(w http.ResponseWriter, r *http.Request) {
 // @Param id path string true "Post with id"
 // @Success 202 {object} response.PostResponseDto
 // @Failure 401 {object} response.ErrorResponseDto
+// @Failure 404 {object} response.ErrorResponseDto
 // @Failure 500 {object} response.ErrorResponseDto
 // @Security ApiKeyAuth
 // @Router /post/{id}/publish [get]
@@ -225,8 +239,13 @@ func (h *Handler) publishPost(w http.ResponseWriter, r *http.Request) {
 
 		log.Print(err)
 
-		// TODO: check sql.ErrNoRows to send StatusNotFound
-		errorResp := responsedto.NewErrorResponseDto(http.StatusInternalServerError, errors.ErrInternal.Error())
+		var errorResp responsedto.ErrorResponseDto
+		if err == repoerrors.ErrPostNotFound {
+			errorResp = responsedto.NewErrorResponseDto(http.StatusNotFound, err.Error())
+		} else {
+			errorResp = responsedto.NewErrorResponseDto(http.StatusInternalServerError, errors.ErrInternal.Error())
+		}
+
 		errorRespond(w, r, errorResp)
 
 		return

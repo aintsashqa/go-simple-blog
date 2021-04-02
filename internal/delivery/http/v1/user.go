@@ -10,6 +10,7 @@ import (
 	"github.com/aintsashqa/go-simple-blog/internal/delivery/http/v1/errors"
 	requestdto "github.com/aintsashqa/go-simple-blog/internal/delivery/http/v1/request"
 	responsedto "github.com/aintsashqa/go-simple-blog/internal/delivery/http/v1/response"
+	repoerrors "github.com/aintsashqa/go-simple-blog/internal/repository/errors"
 	"github.com/aintsashqa/go-simple-blog/internal/service"
 	"github.com/go-chi/chi"
 	uuid "github.com/satori/go.uuid"
@@ -68,6 +69,7 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 // @Param payload body request.SignInUserRequestDto true "Sign in with account details"
 // @Success 200 {object} response.TokenResponseDto
 // @Failure 400 {object} response.ErrorResponseDto
+// @Failure 404 {object} response.ErrorResponseDto
 // @Failure 500 {object} response.ErrorResponseDto
 // @Router /user/sign-in [post]
 func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
@@ -89,8 +91,15 @@ func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 
 		log.Print(err)
 
-		// TODO: check sql.ErrNoRows to send StatusNotFound, passwords not equals to send StatusBadRequest
-		errorResp := responsedto.NewErrorResponseDto(http.StatusInternalServerError, errors.ErrInternal.Error())
+		// TODO: check passwords not equals to send StatusBadRequest
+		var errorResp responsedto.ErrorResponseDto
+		if err == repoerrors.ErrUserNotFound {
+			errorResp = responsedto.NewErrorResponseDto(http.StatusNotFound, err.Error())
+		} else {
+			errorResp = responsedto.NewErrorResponseDto(http.StatusInternalServerError, errors.ErrInternal.Error())
+
+		}
+
 		errorRespond(w, r, errorResp)
 
 		return
@@ -108,6 +117,7 @@ func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 // @Produce json
 // @Param id path string string "User with id"
 // @Success 200 {object} response.UserResponseDto
+// @Failure 404 {object} response.ErrorResponseDto
 // @Failure 500 {object} response.ErrorResponseDto
 // @Router /user/{id} [get]
 func (h *Handler) getSingleUser(w http.ResponseWriter, r *http.Request) {
@@ -134,8 +144,13 @@ func (h *Handler) getSingleUser(w http.ResponseWriter, r *http.Request) {
 
 			log.Print(err)
 
-			// TODO: check sql.ErrNoRows to send StatusNotFound
-			errorResp := responsedto.NewErrorResponseDto(http.StatusInternalServerError, errors.ErrInternal.Error())
+			var errorResp responsedto.ErrorResponseDto
+			if err == repoerrors.ErrUserNotFound {
+				errorResp = responsedto.NewErrorResponseDto(http.StatusNotFound, err.Error())
+			} else {
+				errorResp = responsedto.NewErrorResponseDto(http.StatusInternalServerError, errors.ErrInternal.Error())
+			}
+
 			errorRespond(w, r, errorResp)
 
 			return
@@ -160,6 +175,7 @@ func (h *Handler) getSingleUser(w http.ResponseWriter, r *http.Request) {
 // @Failure 400 {object} response.ErrorResponseDto
 // @Failure 401 {object} response.ErrorResponseDto
 // @Failure 403 {object} response.ErrorResponseDto
+// @Failure 404 {object} response.ErrorResponseDto
 // @Failure 500 {object} response.ErrorResponseDto
 // @Security ApiKeyAuth
 // @Router /user/{id} [put]
@@ -182,8 +198,13 @@ func (h *Handler) updateUser(w http.ResponseWriter, r *http.Request) {
 
 		log.Print(err)
 
-		// TODO: check sql.ErrNoRows to send StatusNotFound
-		errorResp := responsedto.NewErrorResponseDto(http.StatusInternalServerError, errors.ErrInternal.Error())
+		var errorResp responsedto.ErrorResponseDto
+		if err == repoerrors.ErrUserNotFound {
+			errorResp = responsedto.NewErrorResponseDto(http.StatusNotFound, err.Error())
+		} else {
+			errorResp = responsedto.NewErrorResponseDto(http.StatusInternalServerError, errors.ErrInternal.Error())
+		}
+
 		errorRespond(w, r, errorResp)
 
 		return

@@ -2,11 +2,13 @@ package mysql_test
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"testing"
 
 	"github.com/aintsashqa/go-simple-blog/internal/domain"
 	"github.com/aintsashqa/go-simple-blog/internal/repository"
+	repoerror "github.com/aintsashqa/go-simple-blog/internal/repository/errors"
 	"github.com/aintsashqa/go-simple-blog/internal/repository/mysql"
 	mock_database "github.com/aintsashqa/go-simple-blog/pkg/database/mocks"
 	"github.com/golang/mock/gomock"
@@ -77,6 +79,14 @@ func (s *PostRepositorySuite) TestFindMethod() {
 				},
 			},
 			MethodResultError:            nil,
+			MockDatabasePrivoderBehavior: mockDatabasePrivoderBehavior,
+		},
+		{
+			Name:                         "NotFound",
+			InputID:                      uuid.Nil,
+			DatabaseResultError:          sql.ErrNoRows,
+			MethodResultValue:            domain.Post{},
+			MethodResultError:            repoerror.ErrPostNotFound,
 			MockDatabasePrivoderBehavior: mockDatabasePrivoderBehavior,
 		},
 		{
@@ -241,6 +251,13 @@ func (s *PostRepositorySuite) TestUpdateMethod() {
 			MockDatabasePrivoderBehavior: mockDatabasePrivoderBehavior,
 		},
 		{
+			Name:                         "NotFound",
+			InputPost:                    domain.Post{},
+			DatabaseResultError:          sql.ErrNoRows,
+			MethodResultError:            repoerror.ErrPostNotFound,
+			MockDatabasePrivoderBehavior: mockDatabasePrivoderBehavior,
+		},
+		{
 			Name:                         "DatabaseFailure",
 			InputPost:                    domain.Post{},
 			DatabaseResultError:          databaseResultError,
@@ -283,6 +300,13 @@ func (s *PostRepositorySuite) TestPublishMethod() {
 			InputPost:                    domain.Post{},
 			DatabaseResultError:          nil,
 			MethodResultError:            nil,
+			MockDatabasePrivoderBehavior: mockDatabasePrivoderBehavior,
+		},
+		{
+			Name:                         "DatabaseFailure",
+			InputPost:                    domain.Post{},
+			DatabaseResultError:          sql.ErrNoRows,
+			MethodResultError:            repoerror.ErrPostNotFound,
 			MockDatabasePrivoderBehavior: mockDatabasePrivoderBehavior,
 		},
 		{
