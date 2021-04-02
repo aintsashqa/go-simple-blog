@@ -18,5 +18,5 @@ tests: mock-gen
 dstop:
 	docker-compose -f "docker-compose.yml" down
 
-dstart: dstop
+dstart: swagger-gen dstop
 	docker-compose -f "docker-compose.yml" up -d --build
