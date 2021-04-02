@@ -7,7 +7,6 @@ import (
 	"github.com/aintsashqa/go-simple-blog/internal/domain"
 	"github.com/aintsashqa/go-simple-blog/pkg/database"
 	uuid "github.com/satori/go.uuid"
-	"gopkg.in/guregu/null.v4"
 )
 
 type PostRepos struct {
@@ -62,7 +61,7 @@ func (r *PostRepos) Update(ctx context.Context, post domain.Post) error {
 	return r.database.Exec(ctx, query, post.Title, post.Slug, post.Content, post.UpdatedAt, post.PublishedAt, post.ID)
 }
 
-func (r *PostRepos) Publish(ctx context.Context, id uuid.UUID, value null.Time) error {
-	query := fmt.Sprintf("update %s set published_at = ? where (id = ? and deleted_at is null)", postsTable)
-	return r.database.Exec(ctx, query, value, id)
+func (r *PostRepos) Publish(ctx context.Context, post domain.Post) error {
+	query := fmt.Sprintf("update %s set published_at = ?, updated_at = ? where (id = ? and deleted_at is null)", postsTable)
+	return r.database.Exec(ctx, query, post.PublishedAt, post.UpdatedAt, post.ID)
 }

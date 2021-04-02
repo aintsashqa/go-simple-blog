@@ -8,7 +8,6 @@ import (
 	"github.com/aintsashqa/go-simple-blog/internal/repository/mysql"
 	"github.com/aintsashqa/go-simple-blog/pkg/database"
 	uuid "github.com/satori/go.uuid"
-	"gopkg.in/guregu/null.v4"
 )
 
 type (
@@ -26,7 +25,7 @@ type (
 		AllPublishedCount(context.Context) (int, error)
 		Create(context.Context, domain.Post) error
 		Update(context.Context, domain.Post) error
-		Publish(context.Context, uuid.UUID, null.Time) error
+		Publish(context.Context, domain.Post) error
 	}
 
 	Repository struct {

@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"testing"
-	"time"
 
 	"github.com/aintsashqa/go-simple-blog/internal/domain"
 	"github.com/aintsashqa/go-simple-blog/internal/repository"
@@ -14,7 +13,6 @@ import (
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
-	"gopkg.in/guregu/null.v4"
 )
 
 type PostRepositorySuite struct {
@@ -275,24 +273,21 @@ func (s *PostRepositorySuite) TestPublishMethod() {
 
 	methodCases := []struct {
 		Name                         string
-		InputID                      uuid.UUID
-		InputValue                   null.Time
+		InputPost                    domain.Post
 		DatabaseResultError          error
 		MethodResultError            error
 		MockDatabasePrivoderBehavior MockDatabasePrivoderBehavior
 	}{
 		{
 			Name:                         "Success",
-			InputID:                      uuid.NewV4(),
-			InputValue:                   null.NewTime(time.Now(), true),
+			InputPost:                    domain.Post{},
 			DatabaseResultError:          nil,
 			MethodResultError:            nil,
 			MockDatabasePrivoderBehavior: mockDatabasePrivoderBehavior,
 		},
 		{
 			Name:                         "DatabaseFailure",
-			InputID:                      uuid.NewV4(),
-			InputValue:                   null.NewTime(time.Now(), true),
+			InputPost:                    domain.Post{},
 			DatabaseResultError:          databaseResultError,
 			MethodResultError:            databaseResultError,
 			MockDatabasePrivoderBehavior: mockDatabasePrivoderBehavior,
@@ -303,7 +298,7 @@ func (s *PostRepositorySuite) TestPublishMethod() {
 		s.Suite.Run(currentCase.Name, func() {
 			ctx := context.Background()
 			currentCase.MockDatabasePrivoderBehavior(s.MockDatabasePrivoder, ctx, currentCase.DatabaseResultError)
-			err := s.CurrentRepository.Publish(ctx, currentCase.InputID, currentCase.InputValue)
+			err := s.CurrentRepository.Publish(ctx, currentCase.InputPost)
 			s.Assertions.Equal(currentCase.MethodResultError, err)
 		})
 	}
