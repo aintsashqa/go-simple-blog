@@ -25,7 +25,7 @@ type PostPaginationRequestDto struct {
 	UserID       uuid.UUID `json:"-"`
 }
 
-func (dto *PostPaginationRequestDto) FromRequest(r *http.Request) error {
+func (dto *PostPaginationRequestDto) FromRequest(r *http.Request) {
 	currentPage, err := strconv.Atoi(r.URL.Query().Get("current_page"))
 	if err != nil {
 		currentPage = DefaultCurrentPage
@@ -41,8 +41,6 @@ func (dto *PostPaginationRequestDto) FromRequest(r *http.Request) error {
 	dto.CurrentPage = currentPage
 	dto.CountPerPage = countPerPage
 	dto.UserID = userID
-
-	return nil
 }
 
 func (dto *PostPaginationRequestDto) TransformToObject() service.PublishedPostsOptions {
