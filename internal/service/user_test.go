@@ -105,7 +105,8 @@ func (s *UserServiceSuite) TestSignUpMethod() {
 		s.Suite.Run(currentCase.Name, func() {
 			currentCase.MockUserRepositoryBehavior(s.MockUserRepository, currentCase.RepositoryResultError)
 			currentCase.MockHashProviderBehavior(s.MockHashProvider, currentCase.ServiceInput.Password, currentCase.PasswordHash)
-			err := s.CurrentService.SignUp(context.Background(), currentCase.ServiceInput)
+			user, err := s.CurrentService.SignUp(context.Background(), currentCase.ServiceInput)
+			s.Assertions.Equal(currentCase.ServiceInput.Email, user.Email)
 			s.Assertions.Equal(currentCase.RepositoryResultError, err)
 		})
 	}

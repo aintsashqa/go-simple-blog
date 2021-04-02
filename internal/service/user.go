@@ -28,7 +28,7 @@ func NewUserService(
 	return &UserService{repo: repo, hasher: hasher, auth: auth, tokenExpiresTime: tokenExpiresTime}
 }
 
-func (s *UserService) SignUp(ctx context.Context, input SignUpUserInput) error {
+func (s *UserService) SignUp(ctx context.Context, input SignUpUserInput) (domain.User, error) {
 	user := domain.User{
 		Email:    input.Email,
 		Username: fmt.Sprintf("Username%d", time.Now().Unix()),
@@ -36,7 +36,8 @@ func (s *UserService) SignUp(ctx context.Context, input SignUpUserInput) error {
 	}
 	user.Init()
 
-	return s.repo.Create(ctx, user)
+	err := s.repo.Create(ctx, user)
+	return user, err
 }
 
 func (s *UserService) SignIn(ctx context.Context, input SignInUserInput) (Tokens, error) {

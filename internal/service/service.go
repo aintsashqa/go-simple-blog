@@ -37,7 +37,7 @@ type (
 	}
 
 	User interface {
-		SignUp(context.Context, SignUpUserInput) error
+		SignUp(context.Context, SignUpUserInput) (domain.User, error)
 		SignIn(context.Context, SignInUserInput) (Tokens, error)
 		Authenticate(context.Context, AuthenticateUserInput) (uuid.UUID, error)
 		Find(context.Context, uuid.UUID) (domain.User, error)
@@ -80,7 +80,7 @@ type (
 		GetAllPublishedPaginate(context.Context, PublishedPostsOptions) (PublishedPostsPagination, error)
 		Create(context.Context, CreatePostInput) (domain.Post, error)
 		Update(context.Context, UpdatePostInput) (domain.Post, error)
-		Publish(context.Context, uuid.UUID) error
+		Publish(context.Context, uuid.UUID) (domain.Post, error)
 	}
 
 	Service struct {

@@ -97,6 +97,15 @@ func (s *PostService) Update(ctx context.Context, input UpdatePostInput) (domain
 	return post, nil
 }
 
-func (s *PostService) Publish(ctx context.Context, id uuid.UUID) error {
-	return s.repo.Publish(ctx, id, null.NewTime(time.Now(), true))
+func (s *PostService) Publish(ctx context.Context, id uuid.UUID) (domain.Post, error) {
+	post, err := s.repo.Find(ctx, id)
+	if err != nil {
+		return domain.Post{}, err
+	}
+
+	post.PublishedAt = null.NewTime(time.Now(), true)
+	post.Update()
+
+	err = s.repo.Publish(ctx, post)
+	return post, err
 }
