@@ -89,8 +89,13 @@ type (
 		Cache cache.CachePrivoder
 	}
 
+	DataProvider interface {
+		UserProvider() repository.User
+		PostProvider() repository.Post
+	}
+
 	ServiceDependencies struct {
-		Repository                    *repository.Repository
+		DataProvider                  DataProvider
 		Cache                         cache.CachePrivoder
 		Hasher                        hash.HashProvider
 		Authorization                 auth.AuthorizationProvider
@@ -100,8 +105,8 @@ type (
 
 func NewService(deps ServiceDependencies) *Service {
 	return &Service{
-		User:  NewUserService(deps.Repository.User, deps.Hasher, deps.Authorization, deps.AuthorizationTokenExpiresTime),
-		Post:  NewPostService(deps.Repository.Post),
+		User:  NewUserService(deps.DataProvider.UserProvider(), deps.Hasher, deps.Authorization, deps.AuthorizationTokenExpiresTime),
+		Post:  NewPostService(deps.DataProvider.PostProvider()),
 		Cache: deps.Cache,
 	}
 }

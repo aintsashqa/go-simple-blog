@@ -40,3 +40,11 @@ func NewRepository(database database.DatabasePrivoder) *Repository {
 		Post: mysql.NewPostRepos(database),
 	}
 }
+
+func (r *Repository) UserProvider() User {
+	return r.User
+}
+
+func (r *Repository) PostProvider() Post {
+	return r.Post
+}

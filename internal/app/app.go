@@ -62,7 +62,7 @@ func Run() {
 	auth := jwt.NewJWTAuthorizationProvider(cfg.Auth.JWTSigningKey)
 
 	services := service.NewService(service.ServiceDependencies{
-		Repository:                    repos,
+		DataProvider:                  repos,
 		Hasher:                        hasher,
 		Authorization:                 auth,
 		AuthorizationTokenExpiresTime: cfg.Auth.JWTExpiresTime,
