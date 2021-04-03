@@ -23,6 +23,7 @@ type (
 		GetAllPublished(context.Context, int, int) ([]domain.Post, error)
 		GetAllPublishedWithUserID(context.Context, uuid.UUID, int, int) ([]domain.Post, error)
 		AllPublishedCount(context.Context) (int, error)
+		AllPublishedCountWithUserID(context.Context, uuid.UUID) (int, error)
 		Create(context.Context, domain.Post) error
 		Update(context.Context, domain.Post) error
 		Publish(context.Context, domain.Post) error

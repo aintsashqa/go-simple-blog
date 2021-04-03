@@ -56,6 +56,13 @@ func (r *PostRepos) AllPublishedCount(ctx context.Context) (int, error) {
 	return count, err
 }
 
+func (r *PostRepos) AllPublishedCountWithUserID(ctx context.Context, id uuid.UUID) (int, error) {
+	var count int
+	query := fmt.Sprintf("select count(*) from %s where (user_id = ? and published_at is not null and deleted_at is null)", postsTable)
+	err := r.database.QueryRow(ctx, &count, query, id)
+	return count, err
+}
+
 func (r *PostRepos) Create(ctx context.Context, post domain.Post) error {
 	query := fmt.Sprintf("insert into %s (id, title, slug, content, user_id, created_at, updated_at, published_at, deleted_at) values (?, ?, ?, ?, ?, ?, ?, ?, ?)", postsTable)
 	return r.database.Exec(ctx, query, post.ID, post.Title, post.Slug, post.Content, post.UserID, post.CreatedAt, post.UpdatedAt, post.PublishedAt, post.DeletedAt)

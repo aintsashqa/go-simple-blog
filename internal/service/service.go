@@ -68,6 +68,7 @@ type (
 
 	PublishedPostsPagination struct {
 		Posts        []domain.Post
+		PostsCount   int
 		PreviousPage int
 		CurrentPage  int
 		NextPage     int

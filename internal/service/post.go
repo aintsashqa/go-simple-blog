@@ -24,23 +24,35 @@ func (s *PostService) Find(ctx context.Context, id uuid.UUID) (domain.Post, erro
 }
 
 func (s *PostService) GetAllPublishedPaginate(ctx context.Context, opt PublishedPostsOptions) (PublishedPostsPagination, error) {
+	var count int
 	var posts []domain.Post
 	var err error
 
-	count, err := s.repo.AllPublishedCount(ctx)
-	if err != nil {
-		return PublishedPostsPagination{}, err
-	}
-
 	offset := (opt.CurrentPage - 1) * opt.PostsPerPage
-	if opt.UserID != uuid.Nil {
-		posts, err = s.repo.GetAllPublishedWithUserID(ctx, opt.UserID, offset, opt.PostsPerPage)
-	} else {
-		posts, err = s.repo.GetAllPublished(ctx, offset, opt.PostsPerPage)
-	}
 
-	if err != nil {
-		return PublishedPostsPagination{}, err
+	if opt.UserID != uuid.Nil {
+
+		posts, err = s.repo.GetAllPublishedWithUserID(ctx, opt.UserID, offset, opt.PostsPerPage)
+		if err != nil {
+			return PublishedPostsPagination{}, err
+		}
+
+		count, err = s.repo.AllPublishedCountWithUserID(ctx, opt.UserID)
+		if err != nil {
+			return PublishedPostsPagination{}, err
+		}
+
+	} else {
+
+		posts, err = s.repo.GetAllPublished(ctx, offset, opt.PostsPerPage)
+		if err != nil {
+			return PublishedPostsPagination{}, err
+		}
+
+		count, err = s.repo.AllPublishedCount(ctx)
+		if err != nil {
+			return PublishedPostsPagination{}, err
+		}
 	}
 
 	previousPage := opt.CurrentPage - 1
@@ -58,6 +70,7 @@ func (s *PostService) GetAllPublishedPaginate(ctx context.Context, opt Published
 
 	return PublishedPostsPagination{
 		Posts:        posts,
+		PostsCount:   count,
 		PreviousPage: previousPage,
 		CurrentPage:  opt.CurrentPage,
 		NextPage:     nextPage,

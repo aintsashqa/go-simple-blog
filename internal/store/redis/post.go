@@ -59,6 +59,10 @@ func (c *PostCache) AllPublishedCount(ctx context.Context) (int, error) {
 	return c.repo.AllPublishedCount(ctx)
 }
 
+func (c *PostCache) AllPublishedCountWithUserID(ctx context.Context, id uuid.UUID) (int, error) {
+	return c.repo.AllPublishedCountWithUserID(ctx, id)
+}
+
 func (c *PostCache) Create(ctx context.Context, post domain.Post) error {
 	err := c.repo.Create(ctx, post)
 	if err != nil {
