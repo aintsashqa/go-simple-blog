@@ -3,6 +3,7 @@ package mysql
 import (
 	"context"
 
+	"github.com/aintsashqa/go-simple-blog/pkg/database"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -39,6 +40,16 @@ func (p *MySQLProvider) Select(ctx context.Context, dest interface{}, query stri
 func (p *MySQLProvider) QueryRow(ctx context.Context, dest interface{}, query string, args ...interface{}) error {
 	result := p.db.QueryRowContext(ctx, query, args...)
 	return result.Scan(dest)
+}
+
+func (p *MySQLProvider) BeginTx(ctx context.Context) (database.DatabaseTx, error) {
+	tx, err := p.db.BeginTxx(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	result := &MySQLTx{tx: tx}
+	return result, nil
 }
 
 func (p *MySQLProvider) Close() error {

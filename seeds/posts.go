@@ -12,7 +12,7 @@ import (
 	"gopkg.in/guregu/null.v4"
 )
 
-func PostSeed(ctx context.Context, faker faker.Faker, database database.DatabasePrivoder) error {
+func PostSeed(ctx context.Context, faker faker.Faker, tx database.DatabaseInterface) error {
 	rand.Seed(time.Now().Unix())
 
 	userQuery := "select * from users"
@@ -20,11 +20,11 @@ func PostSeed(ctx context.Context, faker faker.Faker, database database.Database
 	query := "insert into posts (id, title, slug, content, user_id, created_at, updated_at, published_at, deleted_at) values (?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
 	var users []domain.User
-	if err := database.Select(ctx, &users, userQuery); err != nil {
+	if err := tx.Select(ctx, &users, userQuery); err != nil {
 		return err
 	}
 
-	if err := database.Exec(ctx, trancate); err != nil {
+	if err := tx.Exec(ctx, trancate); err != nil {
 		return err
 	}
 
@@ -43,7 +43,7 @@ func PostSeed(ctx context.Context, faker faker.Faker, database database.Database
 			}
 			temp.Init()
 
-			if err := database.Exec(ctx, query, temp.ID, temp.Title, temp.Slug, temp.Content, temp.UserID, temp.CreatedAt, temp.UpdatedAt, temp.PublishedAt, temp.DeletedAt); err != nil {
+			if err := tx.Exec(ctx, query, temp.ID, temp.Title, temp.Slug, temp.Content, temp.UserID, temp.CreatedAt, temp.UpdatedAt, temp.PublishedAt, temp.DeletedAt); err != nil {
 				return err
 			}
 		}

@@ -7,7 +7,7 @@ import (
 	"github.com/jaswdr/faker"
 )
 
-type SeedFunc func(context.Context, faker.Faker, database.DatabasePrivoder) error
+type SeedFunc func(context.Context, faker.Faker, database.DatabaseInterface) error
 
 type Seeder struct {
 	database database.DatabasePrivoder
@@ -20,15 +20,20 @@ func NewSeeder(database database.DatabasePrivoder) *Seeder {
 func (s *Seeder) Seed(ctx context.Context, fslice ...SeedFunc) error {
 	faker := faker.New()
 
-	// TODO: start database transaction
+	tx, err := s.database.BeginTx(ctx)
+	if err != nil {
+		return err
+	}
 
 	for _, f := range fslice {
-		if err := f(ctx, faker, s.database); err != nil {
-			// TODO: rollback database transaction
+		if err := f(ctx, faker, tx); err != nil {
+			if err := tx.Rollback(); err != nil {
+				return err
+			}
+
 			return err
 		}
 	}
 
-	// TODO: commit database transaction
-	return nil
+	return tx.Commit()
 }
