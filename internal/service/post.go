@@ -61,11 +61,9 @@ func (s *PostService) GetAllPublishedPaginate(ctx context.Context, opt Published
 	}
 
 	nextPage := opt.CurrentPage + 1
-	maxPage := count / opt.PostsPerPage
-	if maxPage == 0 {
-		nextPage = 1
-	} else if maxPage <= nextPage {
-		nextPage = maxPage
+	value := count - (opt.PostsPerPage * opt.CurrentPage)
+	if value <= 0 {
+		nextPage = opt.CurrentPage
 	}
 
 	return PublishedPostsPagination{
