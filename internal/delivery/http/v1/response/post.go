@@ -10,6 +10,7 @@ import (
 )
 
 type PaginationResponseDto struct {
+	Count        int `json:"count"`
 	PreviousPage int `json:"previous_page"`
 	CurrentPage  int `json:"current_page"`
 	NextPage     int `json:"next_page"`
@@ -31,6 +32,7 @@ func (dto *PostPaginationResponseDto) TransformFromObject(posts service.Publishe
 	}
 
 	dto.Pagination = PaginationResponseDto{
+		Count:        posts.PostsCount,
 		PreviousPage: posts.PreviousPage,
 		CurrentPage:  posts.CurrentPage,
 		NextPage:     posts.NextPage,
