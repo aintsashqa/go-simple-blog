@@ -13,6 +13,7 @@ require (
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/golang-migrate/migrate/v4 v4.14.1
 	github.com/golang/mock v1.5.0
+	github.com/gosimple/slug v1.9.0
 	github.com/jmoiron/sqlx v1.3.1
 	github.com/satori/go.uuid v1.2.0
 	github.com/spf13/viper v1.7.1

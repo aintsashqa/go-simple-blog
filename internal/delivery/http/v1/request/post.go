@@ -94,7 +94,7 @@ func (dto *CreatePostRequestDto) TransformToObject() service.CreatePostInput {
 func (dto *CreatePostRequestDto) validate() error {
 	return validation.ValidateStruct(dto,
 		validation.Field(&dto.Title, validation.Required, validation.Length(8, 255)),
-		validation.Field(&dto.Slug, validation.Required, validation.Length(8, 255)),
+		validation.Field(&dto.Slug, validation.When(len(dto.Slug) != 0, validation.Length(8, 255))),
 		validation.Field(&dto.Content, validation.Required, validation.Length(500, 0)),
 		validation.Field(&dto.IsPublished),
 	)
@@ -136,9 +136,9 @@ func (dto *UpdatePostRequestDto) TransformToObject() service.UpdatePostInput {
 
 func (dto *UpdatePostRequestDto) validate() error {
 	return validation.ValidateStruct(dto,
-		validation.Field(&dto.Title, validation.NotNil, validation.Length(8, 255)),
-		validation.Field(&dto.Slug, validation.NotNil, validation.Length(8, 255)),
-		validation.Field(&dto.Content, validation.NotNil, validation.Length(500, 0)),
+		validation.Field(&dto.Title, validation.Required, validation.Length(8, 255)),
+		validation.Field(&dto.Slug, validation.When(len(dto.Slug) != 0, validation.Length(8, 255))),
+		validation.Field(&dto.Content, validation.Required, validation.Length(500, 0)),
 		validation.Field(&dto.IsPublished),
 	)
 }

@@ -6,6 +6,7 @@ import (
 
 	"github.com/aintsashqa/go-simple-blog/internal/domain"
 	"github.com/aintsashqa/go-simple-blog/internal/repository"
+	"github.com/gosimple/slug"
 	uuid "github.com/satori/go.uuid"
 	"gopkg.in/guregu/null.v4"
 )
@@ -65,9 +66,14 @@ func (s *PostService) GetAllPublishedPaginate(ctx context.Context, opt Published
 }
 
 func (s *PostService) Create(ctx context.Context, input CreatePostInput) (domain.Post, error) {
+	slugStr := input.Slug
+	if len(slugStr) == 0 {
+		slugStr = slug.Make(input.Title)
+	}
+
 	post := domain.Post{
 		Title:       input.Title,
-		Slug:        input.Slug,
+		Slug:        slugStr,
 		Content:     input.Content,
 		UserID:      input.UserID,
 		PublishedAt: null.NewTime(time.Now(), input.IsPublished),
@@ -84,8 +90,13 @@ func (s *PostService) Update(ctx context.Context, input UpdatePostInput) (domain
 		return domain.Post{}, err
 	}
 
+	slugStr := input.Slug
+	if len(slugStr) == 0 {
+		slugStr = slug.Make(input.Title)
+	}
+
 	post.Title = input.Title
-	post.Slug = input.Slug
+	post.Slug = slugStr
 	post.Content = input.Content
 	post.PublishedAt = null.NewTime(time.Now(), input.IsPublished)
 	post.Update()
