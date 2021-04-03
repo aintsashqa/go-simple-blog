@@ -21,5 +21,5 @@ tests: vendor mock-gen
 dstop:
 	docker-compose -f "docker-compose.yml" down
 
-dstart: vendor swagger-gen dstop
+dstart: swagger-gen dstop
 	docker-compose -f "docker-compose.yml" up -d --build
