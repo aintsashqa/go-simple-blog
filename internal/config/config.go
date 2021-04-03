@@ -9,10 +9,11 @@ import (
 
 type (
 	Config struct {
-		App      AppConfig           `mapstructure:"app"`
-		Database MySQLDatabaseConfig `mapstructure:"db"`
-		Auth     AuthorizationConfig `mapstructure:"auth"`
-		Cache    CacheConfig         `mapstructure:"cache"`
+		Development bool                `mapstructure:"env_dev"`
+		App         AppConfig           `mapstructure:"app"`
+		Database    MySQLDatabaseConfig `mapstructure:"db"`
+		Auth        AuthorizationConfig `mapstructure:"auth"`
+		Cache       CacheConfig         `mapstructure:"cache"`
 	}
 
 	AppConfig struct {

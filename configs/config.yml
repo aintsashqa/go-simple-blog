@@ -1,3 +1,5 @@
+env_dev: true
+
 app:
   host: localhost
   port: 8080

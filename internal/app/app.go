@@ -18,6 +18,7 @@ import (
 	"github.com/aintsashqa/go-simple-blog/pkg/cache/redis"
 	"github.com/aintsashqa/go-simple-blog/pkg/database/mysql"
 	"github.com/aintsashqa/go-simple-blog/pkg/hash/bcrypt"
+	"github.com/aintsashqa/go-simple-blog/seeds"
 )
 
 // @title Go Simple Blog API
@@ -46,6 +47,13 @@ func Run() {
 	})
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	if cfg.Development {
+		seeder := seeds.NewSeeder(database)
+		if err := seeder.Seed(ctx, seeds.UserSeed, seeds.PostSeed); err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	cache, err := redis.NewRedisProvider(ctx, redis.Config{
