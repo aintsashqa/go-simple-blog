@@ -19,7 +19,7 @@ import (
 // @Accept json
 // @Produce json
 // @Param current_page query int false "Number of current page"
-// @Param posts_per_page query int false "Number of posts count"
+// @Param count_per_page query int false "Number of posts count"
 // @Param user_id query string false "Posts with user id"
 // @Success 200 {object} response.PostPaginationResponseDto
 // @Failure 500 {object} response.ErrorResponseDto
