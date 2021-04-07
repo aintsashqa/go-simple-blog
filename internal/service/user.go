@@ -32,7 +32,7 @@ func (s *UserService) SignUp(ctx context.Context, input SignUpUserInput) (domain
 	user := domain.User{
 		Email:    input.Email,
 		Username: fmt.Sprintf("Username%d", time.Now().Unix()),
-		Password: s.hasher.Make(input.Password),
+		Password: input.Password,
 	}
 	user.Init()
 
@@ -40,6 +40,7 @@ func (s *UserService) SignUp(ctx context.Context, input SignUpUserInput) (domain
 		return domain.User{}, err
 	}
 
+	user.Password = s.hasher.Make(user.Password)
 	err := s.repo.Create(ctx, user)
 	return user, err
 }

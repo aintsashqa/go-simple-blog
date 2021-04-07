@@ -102,7 +102,7 @@ func (s *UserServiceSuite) TestSignUpMethod() {
 			RepositoryResultError:      nil,
 			ServiceResultError:         domain.ErrUserEmailEmptyValue,
 			MockUserRepositoryBehavior: nil,
-			MockHashProviderBehavior:   mockHashProviderBehavior,
+			MockHashProviderBehavior:   nil,
 		},
 		{
 			Name:         "RepositoryFailure",
@@ -123,7 +123,9 @@ func (s *UserServiceSuite) TestSignUpMethod() {
 			if currentCase.MockUserRepositoryBehavior != nil {
 				currentCase.MockUserRepositoryBehavior(s.MockUserRepository, currentCase.RepositoryResultError)
 			}
-			currentCase.MockHashProviderBehavior(s.MockHashProvider, currentCase.ServiceInput.Password, currentCase.PasswordHash)
+			if currentCase.MockHashProviderBehavior != nil {
+				currentCase.MockHashProviderBehavior(s.MockHashProvider, currentCase.ServiceInput.Password, currentCase.PasswordHash)
+			}
 			user, err := s.CurrentService.SignUp(context.Background(), currentCase.ServiceInput)
 			s.Assertions.Equal(currentCase.ServiceInput.Email, user.Email)
 			s.Assertions.Equal(currentCase.ServiceResultError, err)
