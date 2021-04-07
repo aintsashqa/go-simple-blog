@@ -139,3 +139,13 @@ func (s *PostService) Publish(ctx context.Context, id uuid.UUID) (domain.Post, e
 	err = s.repo.Publish(ctx, post)
 	return post, err
 }
+
+func (s *PostService) SoftDelete(ctx context.Context, input SoftDeletePostInput) error {
+	post, err := s.repo.FindWithPrimaryAndUserID(ctx, input.PostID, input.UserID)
+	if err != nil {
+		return err
+	}
+
+	post.Delete()
+	return s.repo.SoftDelete(ctx, post)
+}

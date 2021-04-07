@@ -29,6 +29,16 @@ func (r *PostRepos) Find(ctx context.Context, id uuid.UUID) (domain.Post, error)
 	return post, err
 }
 
+func (r *PostRepos) FindWithPrimaryAndUserID(ctx context.Context, postID uuid.UUID, userID uuid.UUID) (domain.Post, error) {
+	var post domain.Post
+	query := fmt.Sprintf("select * from %s where (id = ? and user_id = ? and deleted_at is null)", postsTable)
+	err := r.database.Get(ctx, &post, query, postID, userID)
+	if err == sql.ErrNoRows {
+		return post, errors.ErrPostNotFound
+	}
+	return post, err
+}
+
 func (r *PostRepos) GetAllPublished(ctx context.Context, offset, count int) ([]domain.Post, error) {
 	var posts []domain.Post
 	query := fmt.Sprintf("select * from %s where (published_at is not null and deleted_at is null) limit ?, ?", postsTable)
@@ -80,6 +90,15 @@ func (r *PostRepos) Update(ctx context.Context, post domain.Post) error {
 func (r *PostRepos) Publish(ctx context.Context, post domain.Post) error {
 	query := fmt.Sprintf("update %s set published_at = ?, updated_at = ? where (id = ? and deleted_at is null)", postsTable)
 	err := r.database.Exec(ctx, query, post.PublishedAt, post.UpdatedAt, post.ID)
+	if err == sql.ErrNoRows {
+		return errors.ErrPostNotFound
+	}
+	return err
+}
+
+func (r *PostRepos) SoftDelete(ctx context.Context, post domain.Post) error {
+	query := fmt.Sprintf("update %s set updated_at = ?, deleted_at = ? where (id = ? and deleted_at is null)", postsTable)
+	err := r.database.Exec(ctx, query, post.UpdatedAt, post.DeletedAt, post.ID)
 	if err == sql.ErrNoRows {
 		return errors.ErrPostNotFound
 	}

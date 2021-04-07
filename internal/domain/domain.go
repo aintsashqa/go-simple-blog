@@ -76,6 +76,7 @@ func (m *Model) Update() {
 }
 
 func (m *Model) Delete() {
+	m.Update()
 	m.DeletedAt = null.NewTime(time.Now(), true)
 }
 

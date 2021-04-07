@@ -112,3 +112,30 @@ func (dto *UpdatePostRequestDto) TransformToObject() service.UpdatePostInput {
 		IsPublished: dto.IsPublished,
 	}
 }
+
+type DeletePostRequestDto struct {
+	UserID uuid.UUID `json:"-"`
+	PostID uuid.UUID `json:"-"`
+}
+
+func (dto *DeletePostRequestDto) FromRequest(r *http.Request) (response.ErrorResponseDto, error) {
+	userID, casted := r.Context().Value("user_id").(uuid.UUID)
+	if !casted {
+		response := response.NewErrorResponseDto(http.StatusForbidden, errors.ErrInvalidTokenUserId.Error())
+		return response, errors.ErrInvalidTokenUserId
+	}
+
+	postID := uuid.FromStringOrNil(chi.URLParam(r, "id"))
+
+	dto.UserID = userID
+	dto.PostID = postID
+
+	return response.ErrorResponseDto{}, nil
+}
+
+func (dto *DeletePostRequestDto) TransformToObject() service.SoftDeletePostInput {
+	return service.SoftDeletePostInput{
+		UserID: dto.UserID,
+		PostID: dto.PostID,
+	}
+}

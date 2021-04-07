@@ -37,6 +37,7 @@ func (h *Handler) Init(r chi.Router) {
 				r.Post("/", h.CreatePost)
 				r.Put("/{id}", h.UpdatePost)
 				r.Get("/{id}/publish", h.PublishPost)
+				r.Delete("/{id}", h.DeletePost)
 			})
 		})
 	})

@@ -20,6 +20,7 @@ type (
 
 	Post interface {
 		Find(context.Context, uuid.UUID) (domain.Post, error)
+		FindWithPrimaryAndUserID(context.Context, uuid.UUID, uuid.UUID) (domain.Post, error)
 		GetAllPublished(context.Context, int, int) ([]domain.Post, error)
 		GetAllPublishedWithUserID(context.Context, uuid.UUID, int, int) ([]domain.Post, error)
 		AllPublishedCount(context.Context) (int, error)
@@ -27,6 +28,7 @@ type (
 		Create(context.Context, domain.Post) error
 		Update(context.Context, domain.Post) error
 		Publish(context.Context, domain.Post) error
+		SoftDelete(context.Context, domain.Post) error
 	}
 
 	Repository struct {

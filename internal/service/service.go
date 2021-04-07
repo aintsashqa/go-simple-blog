@@ -76,12 +76,18 @@ type (
 		PostsPerPage int
 	}
 
+	SoftDeletePostInput struct {
+		UserID uuid.UUID
+		PostID uuid.UUID
+	}
+
 	Post interface {
 		Find(context.Context, uuid.UUID) (domain.Post, error)
 		GetAllPublishedPaginate(context.Context, PublishedPostsOptions) (PublishedPostsPagination, error)
 		Create(context.Context, CreatePostInput) (domain.Post, error)
 		Update(context.Context, UpdatePostInput) (domain.Post, error)
 		Publish(context.Context, uuid.UUID) (domain.Post, error)
+		SoftDelete(context.Context, SoftDeletePostInput) error
 	}
 
 	Service struct {

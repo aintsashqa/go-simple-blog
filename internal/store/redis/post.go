@@ -47,6 +47,27 @@ func (c *PostCache) Find(ctx context.Context, id uuid.UUID) (domain.Post, error)
 	return post, err
 }
 
+func (c *PostCache) FindWithPrimaryAndUserID(ctx context.Context, postID uuid.UUID, userID uuid.UUID) (domain.Post, error) {
+	key := fmt.Sprintf(PostCacheKey, postID)
+
+	if value, err := c.provider.Get(ctx, key); err == nil {
+		return c.serializer.Deserialize(value)
+	}
+
+	post, err := c.repo.FindWithPrimaryAndUserID(ctx, postID, userID)
+	if err != nil {
+		return domain.Post{}, err
+	}
+
+	value, err := c.serializer.Serialize(post)
+	if err != nil {
+		return domain.Post{}, err
+	}
+
+	err = c.provider.Set(ctx, key, value)
+	return post, err
+}
+
 func (c *PostCache) GetAllPublished(ctx context.Context, offset int, count int) ([]domain.Post, error) {
 	return c.repo.GetAllPublished(ctx, offset, count)
 }
@@ -106,4 +127,14 @@ func (c *PostCache) Publish(ctx context.Context, post domain.Post) error {
 
 	key := fmt.Sprintf(PostCacheKey, post.ID)
 	return c.provider.Set(ctx, key, value)
+}
+
+func (c *PostCache) SoftDelete(ctx context.Context, post domain.Post) error {
+	key := fmt.Sprintf(PostCacheKey, post.ID)
+
+	if err := c.provider.Delete(ctx, key); err != nil {
+		return err
+	}
+
+	return c.repo.SoftDelete(ctx, post)
 }

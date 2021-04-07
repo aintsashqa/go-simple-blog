@@ -216,3 +216,47 @@ func (h *Handler) PublishPost(w http.ResponseWriter, r *http.Request) {
 	response.TransformFromObject(post)
 	respond(w, r, http.StatusAccepted, response)
 }
+
+// @Summary Delete post
+// @Description Delete post with id
+// @ID post-delete
+// @Tags Post
+// @Accept json
+// @Produce json
+// @Param id path string true "Post with id"
+// @Success 204
+// @Failure 401 {object} response.ErrorResponseDto
+// @Failure 403 {object} response.ErrorResponseDto
+// @Failure 404 {object} response.ErrorResponseDto
+// @Failure 500 {object} response.ErrorResponseDto
+// @Security ApiKeyAuth
+// @Router /post/{id} [delete]
+func (h *Handler) DeletePost(w http.ResponseWriter, r *http.Request) {
+	request := requsetdto.DeletePostRequestDto{}
+
+	if response, err := request.FromRequest(r); err != nil {
+
+		log.Print(err)
+
+		errorRespond(w, r, response)
+		return
+	}
+
+	opt := request.TransformToObject()
+	if err := h.post.SoftDelete(r.Context(), opt); err != nil {
+
+		log.Print(err)
+
+		var errorResp responsedto.ErrorResponseDto
+		if err == repoerrors.ErrPostNotFound {
+			errorResp = responsedto.NewErrorResponseDto(http.StatusNotFound, err.Error())
+		} else {
+			errorResp = responsedto.NewErrorResponseDto(http.StatusInternalServerError, errors.ErrInternal.Error())
+		}
+
+		errorRespond(w, r, errorResp)
+		return
+	}
+
+	respond(w, r, http.StatusNoContent, nil)
+}
