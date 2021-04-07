@@ -24,7 +24,7 @@ import (
 // @Success 200 {object} response.PostPaginationResponseDto
 // @Failure 500 {object} response.ErrorResponseDto
 // @Router /post [get]
-func (h *Handler) getAllPublishedPosts(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetAllPublishedPosts(w http.ResponseWriter, r *http.Request) {
 	request := requsetdto.PostPaginationRequestDto{}
 	response := responsedto.PostPaginationResponseDto{}
 
@@ -56,7 +56,7 @@ func (h *Handler) getAllPublishedPosts(w http.ResponseWriter, r *http.Request) {
 // @Failure 404 {object} response.ErrorResponseDto
 // @Failure 500 {object} response.ErrorResponseDto
 // @Router /post/{id} [get]
-func (h *Handler) getSinglePost(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetSinglePost(w http.ResponseWriter, r *http.Request) {
 	response := responsedto.PostResponseDto{}
 
 	id := uuid.FromStringOrNil(chi.URLParam(r, "id"))
@@ -95,7 +95,7 @@ func (h *Handler) getSinglePost(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {object} response.ErrorResponseDto
 // @Security ApiKeyAuth
 // @Router /post [post]
-func (h *Handler) createPost(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) CreatePost(w http.ResponseWriter, r *http.Request) {
 	request := requsetdto.CreatePostRequestDto{}
 	response := responsedto.PostResponseDto{}
 
@@ -142,7 +142,7 @@ func (h *Handler) createPost(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {object} response.ErrorResponseDto
 // @Security ApiKeyAuth
 // @Router /post/{id} [put]
-func (h *Handler) updatePost(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) UpdatePost(w http.ResponseWriter, r *http.Request) {
 	request := requsetdto.UpdatePostRequestDto{}
 	response := responsedto.PostResponseDto{}
 
@@ -193,7 +193,7 @@ func (h *Handler) updatePost(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {object} response.ErrorResponseDto
 // @Security ApiKeyAuth
 // @Router /post/{id}/publish [get]
-func (h *Handler) publishPost(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) PublishPost(w http.ResponseWriter, r *http.Request) {
 	response := responsedto.PostResponseDto{}
 
 	id := uuid.FromStringOrNil(chi.URLParam(r, "id"))

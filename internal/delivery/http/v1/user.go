@@ -26,7 +26,7 @@ import (
 // @Failure 400 {object} response.ErrorResponseDto
 // @Failure 500 {object} response.ErrorResponseDto
 // @Router /user/sign-up [post]
-func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
 	request := requestdto.SignUpUserRequestDto{}
 	response := responsedto.UserResponseDto{}
 
@@ -66,11 +66,10 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 // @Produce json
 // @Param payload body request.SignInUserRequestDto true "Sign in with account details"
 // @Success 200 {object} response.TokenResponseDto
-// @Failure 400 {object} response.ErrorResponseDto
 // @Failure 404 {object} response.ErrorResponseDto
 // @Failure 500 {object} response.ErrorResponseDto
 // @Router /user/sign-in [post]
-func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) SignIn(w http.ResponseWriter, r *http.Request) {
 	request := requestdto.SignInUserRequestDto{}
 	response := responsedto.TokenResponseDto{}
 
@@ -116,7 +115,7 @@ func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 // @Failure 404 {object} response.ErrorResponseDto
 // @Failure 500 {object} response.ErrorResponseDto
 // @Router /user/{id} [get]
-func (h *Handler) getSingleUser(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetSingleUser(w http.ResponseWriter, r *http.Request) {
 	response := responsedto.UserResponseDto{}
 
 	id := uuid.FromStringOrNil(chi.URLParam(r, "id"))
@@ -156,7 +155,7 @@ func (h *Handler) getSingleUser(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {object} response.ErrorResponseDto
 // @Security ApiKeyAuth
 // @Router /user/{id} [put]
-func (h *Handler) updateUser(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	request := requestdto.UpdateUserRequestDto{}
 	response := responsedto.UserResponseDto{}
 
