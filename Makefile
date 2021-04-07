@@ -1,7 +1,7 @@
 .SILENT:
 
 swagger-gen:
-	swag init -g ./internal/app/app.go -o ./docs/swagger
+	swag init -g ./internal/app/app.go -o ./api/swagger
 
 vendor:
 	go mod vendor

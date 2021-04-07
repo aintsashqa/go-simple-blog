@@ -1,0 +1,556 @@
+basePath: /api/v1
+definitions:
+  request.CreatePostRequestDto:
+    properties:
+      content:
+        type: string
+      is_published:
+        type: boolean
+      slug:
+        type: string
+      title:
+        type: string
+    type: object
+  request.SignInUserRequestDto:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  request.SignUpUserRequestDto:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  request.UpdatePostRequestDto:
+    properties:
+      content:
+        type: string
+      is_published:
+        type: boolean
+      slug:
+        type: string
+      title:
+        type: string
+    type: object
+  request.UpdateUserRequestDto:
+    properties:
+      username:
+        type: string
+    type: object
+  response.ErrorResponseDto:
+    properties:
+      code:
+        type: integer
+      information:
+        items:
+          type: string
+        type: array
+      message:
+        type: string
+    type: object
+  response.PaginationResponseDto:
+    properties:
+      count_per_page:
+        type: integer
+      current_page:
+        type: integer
+      next_page:
+        type: integer
+      previous_page:
+        type: integer
+      total:
+        type: integer
+    type: object
+  response.PostPaginationResponseDto:
+    properties:
+      pagination:
+        $ref: '#/definitions/response.PaginationResponseDto'
+      posts:
+        items:
+          $ref: '#/definitions/response.PostResponseDto'
+        type: array
+    type: object
+  response.PostResponseDto:
+    properties:
+      content:
+        type: string
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      id:
+        type: string
+      is_deleted:
+        type: boolean
+      is_published:
+        description: User        *UserResponseDto `json:"user,omitempty"`
+        type: boolean
+      published_at:
+        type: string
+      slug:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
+    type: object
+  response.TokenResponseDto:
+    properties:
+      access_token:
+        type: string
+    type: object
+  response.UserResponseDto:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      updated_at:
+        type: string
+      username:
+        type: string
+    type: object
+info:
+  contact: {}
+  title: Go Simple Blog API
+  version: 1.0.0
+paths:
+  /post:
+    get:
+      consumes:
+      - application/json
+      description: Get all published with pagination
+      operationId: post-get-all-published
+      parameters:
+      - description: Number of current page
+        in: query
+        name: current_page
+        type: integer
+      - description: Number of posts count
+        in: query
+        name: count_per_page
+        type: integer
+      - description: Posts with user id
+        in: query
+        name: user_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.PostPaginationResponseDto'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponseDto'
+      summary: Get all published
+      tags:
+      - Post
+    post:
+      consumes:
+      - application/json
+      description: Create new post
+      operationId: post-create
+      parameters:
+      - description: Post details
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreatePostRequestDto'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/response.PostResponseDto'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponseDto'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponseDto'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.ErrorResponseDto'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponseDto'
+      security:
+      - ApiKeyAuth: []
+      summary: Create post
+      tags:
+      - Post
+  /post/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete post with id
+      operationId: post-delete
+      parameters:
+      - description: Post with id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponseDto'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.ErrorResponseDto'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponseDto'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponseDto'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete post
+      tags:
+      - Post
+    get:
+      consumes:
+      - application/json
+      description: Get single post by id
+      operationId: post-get-single
+      parameters:
+      - description: Post with id
+        in: path
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.PostResponseDto'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponseDto'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponseDto'
+      summary: Get single post
+      tags:
+      - Post
+    put:
+      consumes:
+      - application/json
+      description: Update post with id
+      operationId: post-update
+      parameters:
+      - description: Post with id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Post details
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdatePostRequestDto'
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/response.PostResponseDto'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponseDto'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponseDto'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponseDto'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponseDto'
+      security:
+      - ApiKeyAuth: []
+      summary: Update post
+      tags:
+      - Post
+  /post/{id}/publish:
+    get:
+      consumes:
+      - application/json
+      description: Publish post with id
+      operationId: post-publish
+      parameters:
+      - description: Post with id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/response.PostResponseDto'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponseDto'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponseDto'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponseDto'
+      security:
+      - ApiKeyAuth: []
+      summary: Publish post
+      tags:
+      - Post
+  /post/self:
+    get:
+      consumes:
+      - application/json
+      description: Get all self post with pagination
+      operationId: post-get-all-self
+      parameters:
+      - description: Number of current page
+        in: query
+        name: current_page
+        type: integer
+      - description: Number of posts count
+        in: query
+        name: count_per_page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.PostPaginationResponseDto'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.ErrorResponseDto'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponseDto'
+      security:
+      - ApiKeyAuth: []
+      summary: Get all self posts
+      tags:
+      - Post
+  /user/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get single user by id
+      operationId: user-get-single
+      parameters:
+      - description: User with id
+        in: path
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.UserResponseDto'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponseDto'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponseDto'
+      summary: Get single user
+      tags:
+      - User
+    put:
+      consumes:
+      - application/json
+      description: Update user with id
+      operationId: user-update
+      parameters:
+      - description: User with id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: User details
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdateUserRequestDto'
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/response.UserResponseDto'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponseDto'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponseDto'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.ErrorResponseDto'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponseDto'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponseDto'
+      security:
+      - ApiKeyAuth: []
+      summary: Update user
+      tags:
+      - User
+  /user/self:
+    get:
+      consumes:
+      - application/json
+      description: Get self user by authorized information
+      operationId: user-get-self
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.UserResponseDto'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.ErrorResponseDto'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponseDto'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponseDto'
+      security:
+      - ApiKeyAuth: []
+      summary: Get self user
+      tags:
+      - User
+  /user/sign-in:
+    post:
+      consumes:
+      - application/json
+      description: Sign in with account details
+      operationId: user-sign-in
+      parameters:
+      - description: Sign in with account details
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/request.SignInUserRequestDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.TokenResponseDto'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponseDto'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponseDto'
+      summary: Sign in
+      tags:
+      - User
+  /user/sign-up:
+    post:
+      consumes:
+      - application/json
+      description: Sign up with account details
+      operationId: user-sign-up
+      parameters:
+      - description: Sign up with account details
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/request.SignUpUserRequestDto'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/response.UserResponseDto'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponseDto'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponseDto'
+      summary: Sign up
+      tags:
+      - User
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
