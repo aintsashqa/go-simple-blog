@@ -1,0 +1,466 @@
+{
+	"info": {
+		"name": "go-simple-blog",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "API",
+			"item": [
+				{
+					"name": "V1",
+					"item": [
+						{
+							"name": "User",
+							"item": [
+								{
+									"name": "Self information",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://{{BASE_URL}}/api/v1/user/self",
+											"protocol": "http",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"user",
+												"self"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Sign in",
+									"request": {
+										"auth": {
+											"type": "noauth"
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"email\": \"email\",\r\n    \"password\": \"password\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://{{BASE_URL}}/api/v1/user/sign-in",
+											"protocol": "http",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"user",
+												"sign-in"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Sign up",
+									"request": {
+										"auth": {
+											"type": "noauth"
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"email\": \"email\",\r\n    \"password\": \"password\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://{{BASE_URL}}/api/v1/user/sign-up",
+											"protocol": "http",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"user",
+												"sign-up"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get single",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://{{BASE_URL}}/api/v1/user/{{SELF_USER_ID}}",
+											"protocol": "http",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"user",
+												"{{SELF_USER_ID}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update single",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"username\": \"username\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://{{BASE_URL}}/api/v1/user/{{SELF_USER_ID}}",
+											"protocol": "http",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"user",
+												"{{SELF_USER_ID}}"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Post",
+							"item": [
+								{
+									"name": "Get all published",
+									"request": {
+										"auth": {
+											"type": "noauth"
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://{{BASE_URL}}/api/v1/post?current_page=1&count_per_page=10",
+											"protocol": "http",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"post"
+											],
+											"query": [
+												{
+													"key": "current_page",
+													"value": "1"
+												},
+												{
+													"key": "count_per_page",
+													"value": "10"
+												},
+												{
+													"key": "user_id",
+													"value": "{{SELF_USER_ID}}",
+													"disabled": true
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create new",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"title\": \"Sample post\",\r\n    \"slug\": \"sample-post\",\r\n    \"content\": \"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse massa velit, mollis vel semper vel, consectetur id libero. Duis in posuere lectus, et scelerisque nunc. Mauris iaculis est at justo porttitor maximus. Nam condimentum dolor vel mattis tincidunt. Vivamus porttitor nisi ullamcorper risus pulvinar porta. Interdum et malesuada fames ac ante ipsum primis in faucibus. Suspendisse potenti. Vestibulum sollicitudin congue aliquet. Sed lectus nisi, interdum lobortis enim in, hendrerit lacinia diam. Proin ex arcu, convallis in neque ac, luctus tincidunt diam. Donec non aliquam orci. Pellentesque mattis sit amet enim sed convallis. Nulla varius pulvinar eleifend. Integer in orci blandit, dapibus mi ac, ullamcorper sapien. Sed mollis libero risus, eu hendrerit justo eleifend sed. Duis rutrum tempor dapibus. In convallis tincidunt fermentum. Praesent sit amet massa vitae ex consectetur pretium in non nibh. Quisque dictum purus orci, at sollicitudin arcu pellentesque ac. Vestibulum tristique ipsum risus, quis condimentum enim imperdiet vitae. Sed lacinia rhoncus tellus, at aliquam nunc tincidunt id. Aliquam dignissim semper tortor at scelerisque. Nullam blandit, arcu id pharetra tempus, magna nulla sollicitudin quam, sed pharetra eros ex a lacus. In tempus tellus at feugiat faucibus. Etiam lorem diam, varius ut volutpat ut, efficitur ac purus. Proin luctus euismod mauris, vitae elementum massa vehicula sit amet. Pellentesque scelerisque tempor turpis eget laoreet. Integer in massa nulla. Duis et fermentum leo, mattis tempus justo. Suspendisse vitae risus condimentum, sagittis enim eget, egestas libero. Vivamus porta nisl venenatis justo dictum, at pretium diam feugiat. Curabitur pellentesque porttitor nunc, quis lobortis augue. Vivamus euismod sapien non auctor mollis. Nulla efficitur mattis suscipit. Aliquam rhoncus ligula turpis, at congue erat elementum vel. Quisque finibus interdum volutpat. Vivamus lobortis massa eget justo facilisis cursus. Curabitur non nisi ullamcorper, vulputate eros ut, viverra arcu. Etiam est orci, aliquam id justo et, lobortis bibendum velit. Donec dapibus, arcu eleifend posuere pharetra, tellus leo faucibus arcu, non semper massa massa non orci. Etiam ac placerat justo, id accumsan nibh. Nam ultrices tincidunt sagittis. Nunc lectus orci, iaculis quis tincidunt vitae, suscipit a neque. Donec et tortor urna. Maecenas a leo vel eros fringilla eleifend. Cras ut malesuada felis. Nulla facilisi. Curabitur pulvinar ultrices arcu, vitae maximus ex fringilla vel. Quisque non purus massa. Sed dapibus congue justo nec vehicula. Praesent aliquet risus lorem, id dictum leo vulputate id. Cras dapibus consequat orci, in congue dolor ultrices non. Mauris vel tristique leo. Donec eu nibh a mi rhoncus faucibus id semper risus. Aliquam tempor lacus sit amet euismod tempus. Proin vel rutrum risus, vitae suscipit enim. Donec convallis velit ut purus scelerisque dignissim. Proin sit amet nunc ac enim sagittis tempor. Duis a congue magna. Nunc bibendum consectetur turpis a efficitur. Duis malesuada condimentum volutpat. In hac habitasse platea dictumst. Sed est massa, vehicula sed elit sodales, elementum facilisis diam. Aliquam dolor massa, vehicula a justo a, dictum accumsan dui. Vivamus dictum erat in scelerisque iaculis. Nulla porttitor diam nec velit lobortis, tristique bibendum tellus tincidunt. Aliquam fringilla, nibh vitae imperdiet finibus, elit sem eleifend risus, nec ullamcorper.\",\r\n    \"is_published\": false\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://{{BASE_URL}}/api/v1/post",
+											"protocol": "http",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"post"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get all created by myself",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://{{BASE_URL}}/api/v1/post/self?current_page=1&count_per_page=10",
+											"protocol": "http",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"post",
+												"self"
+											],
+											"query": [
+												{
+													"key": "current_page",
+													"value": "1"
+												},
+												{
+													"key": "count_per_page",
+													"value": "10"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get single",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://{{BASE_URL}}/api/v1/post/{{POST_ID}}",
+											"protocol": "http",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"post",
+												"{{POST_ID}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update single",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"title\": \"Sample post update\",\r\n    \"slug\": \"Sample post update\",\r\n    \"content\": \"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse massa velit, mollis vel semper vel, consectetur id libero. Duis in posuere lectus, et scelerisque nunc. Mauris iaculis est at justo porttitor maximus. Nam condimentum dolor vel mattis tincidunt. Vivamus porttitor nisi ullamcorper risus pulvinar porta. Interdum et malesuada fames ac ante ipsum primis in faucibus. Suspendisse potenti. Vestibulum sollicitudin congue aliquet. Sed lectus nisi, interdum lobortis enim in, hendrerit lacinia diam. Proin ex arcu, convallis in neque ac, luctus tincidunt diam. Donec non aliquam orci. Pellentesque mattis sit amet enim sed convallis. Nulla varius pulvinar eleifend. Integer in orci blandit, dapibus mi ac, ullamcorper sapien. Sed mollis libero risus, eu hendrerit justo eleifend sed. Duis rutrum tempor dapibus. In convallis tincidunt fermentum. Praesent sit amet massa vitae ex consectetur pretium in non nibh. Quisque dictum purus orci, at sollicitudin arcu pellentesque ac. Vestibulum tristique ipsum risus, quis condimentum enim imperdiet vitae. Sed lacinia rhoncus tellus, at aliquam nunc tincidunt id. Aliquam dignissim semper tortor at scelerisque. Nullam blandit, arcu id pharetra tempus, magna nulla sollicitudin quam, sed pharetra eros ex a lacus. In tempus tellus at feugiat faucibus. Etiam lorem diam, varius ut volutpat ut, efficitur ac purus. Proin luctus euismod mauris, vitae elementum massa vehicula sit amet. Pellentesque scelerisque tempor turpis eget laoreet. Integer in massa nulla. Duis et fermentum leo, mattis tempus justo. Suspendisse vitae risus condimentum, sagittis enim eget, egestas libero. Vivamus porta nisl venenatis justo dictum, at pretium diam feugiat. Curabitur pellentesque porttitor nunc, quis lobortis augue. Vivamus euismod sapien non auctor mollis. Nulla efficitur mattis suscipit. Aliquam rhoncus ligula turpis, at congue erat elementum vel. Quisque finibus interdum volutpat. Vivamus lobortis massa eget justo facilisis cursus. Curabitur non nisi ullamcorper, vulputate eros ut, viverra arcu. Etiam est orci, aliquam id justo et, lobortis bibendum velit. Donec dapibus, arcu eleifend posuere pharetra, tellus leo faucibus arcu, non semper massa massa non orci. Etiam ac placerat justo, id accumsan nibh. Nam ultrices tincidunt sagittis. Nunc lectus orci, iaculis quis tincidunt vitae, suscipit a neque. Donec et tortor urna. Maecenas a leo vel eros fringilla eleifend. Cras ut malesuada felis. Nulla facilisi. Curabitur pulvinar ultrices arcu, vitae maximus ex fringilla vel. Quisque non purus massa. Sed dapibus congue justo nec vehicula. Praesent aliquet risus lorem, id dictum leo vulputate id. Cras dapibus consequat orci, in congue dolor ultrices non. Mauris vel tristique leo. Donec eu nibh a mi rhoncus faucibus id semper risus. Aliquam tempor lacus sit amet euismod tempus. Proin vel rutrum risus, vitae suscipit enim. Donec convallis velit ut purus scelerisque dignissim. Proin sit amet nunc ac enim sagittis tempor. Duis a congue magna. Nunc bibendum consectetur turpis a efficitur. Duis malesuada condimentum volutpat. In hac habitasse platea dictumst. Sed est massa, vehicula sed elit sodales, elementum facilisis diam. Aliquam dolor massa, vehicula a justo a, dictum accumsan dui. Vivamus dictum erat in scelerisque iaculis. Nulla porttitor diam nec velit lobortis, tristique bibendum tellus tincidunt. Aliquam fringilla, nibh vitae imperdiet finibus, elit sem eleifend risus, nec ullamcorper.\",\r\n    \"is_published\": false\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://{{BASE_URL}}/api/v1/post/{{POST_ID}}",
+											"protocol": "http",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"post",
+												"{{POST_ID}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete single",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "http://{{BASE_URL}}/api/v1/post/{{POST_ID}}",
+											"protocol": "http",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"post",
+												"{{POST_ID}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Publish single",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://{{BASE_URL}}/api/v1/post/{{POST_ID}}/publish",
+											"protocol": "http",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"post",
+												"{{POST_ID}}",
+												"publish"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "BASE_URL",
+			"value": ""
+		},
+		{
+			"key": "AUTH_TOKEN",
+			"value": ""
+		},
+		{
+			"key": "SELF_USER_ID",
+			"value": ""
+		},
+		{
+			"key": "POST_ID",
+			"value": ""
+		}
+	]
+}
