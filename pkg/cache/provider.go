@@ -7,4 +7,5 @@ import (
 type CachePrivoder interface {
 	Set(context.Context, string, []byte) error
 	Get(context.Context, string) ([]byte, error)
+	Delete(context.Context, string) error
 }

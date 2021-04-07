@@ -28,3 +28,7 @@ func (p *RedisProvider) Set(ctx context.Context, key string, value []byte) error
 func (p *RedisProvider) Get(ctx context.Context, key string) ([]byte, error) {
 	return p.client.Get(ctx, key).Bytes()
 }
+
+func (p *RedisProvider) Delete(ctx context.Context, key string) error {
+	return p.client.Del(ctx, key).Err()
+}
