@@ -15,6 +15,7 @@ type (
 		Create(context.Context, domain.User) error
 		GetByEmail(context.Context, string) (domain.User, error)
 		Find(context.Context, uuid.UUID) (domain.User, error)
+		Self(context.Context, uuid.UUID) (domain.User, error)
 		Update(context.Context, domain.User) error
 	}
 
@@ -23,8 +24,10 @@ type (
 		FindWithPrimaryAndUserID(context.Context, uuid.UUID, uuid.UUID) (domain.Post, error)
 		GetAllPublished(context.Context, int, int) ([]domain.Post, error)
 		GetAllPublishedWithUserID(context.Context, uuid.UUID, int, int) ([]domain.Post, error)
+		GetAllWithUserID(context.Context, uuid.UUID, int, int) ([]domain.Post, error)
 		AllPublishedCount(context.Context) (int, error)
 		AllPublishedCountWithUserID(context.Context, uuid.UUID) (int, error)
+		TotalCountWithUserID(context.Context, uuid.UUID) (int, error)
 		Create(context.Context, domain.Post) error
 		Update(context.Context, domain.Post) error
 		Publish(context.Context, domain.Post) error

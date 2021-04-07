@@ -67,6 +67,10 @@ func (s *UserService) Find(ctx context.Context, id uuid.UUID) (domain.User, erro
 	return s.repo.Find(ctx, id)
 }
 
+func (s *UserService) Self(ctx context.Context, id uuid.UUID) (domain.User, error) {
+	return s.repo.Self(ctx, id)
+}
+
 func (s *UserService) Update(ctx context.Context, input UpdateUserInput) (domain.User, error) {
 	user, err := s.repo.Find(ctx, input.ID)
 	if err != nil {

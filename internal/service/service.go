@@ -41,6 +41,7 @@ type (
 		SignIn(context.Context, SignInUserInput) (Tokens, error)
 		Authenticate(context.Context, AuthenticateUserInput) (uuid.UUID, error)
 		Find(context.Context, uuid.UUID) (domain.User, error)
+		Self(context.Context, uuid.UUID) (domain.User, error)
 		Update(context.Context, UpdateUserInput) (domain.User, error)
 	}
 
@@ -60,14 +61,13 @@ type (
 		IsPublished bool
 	}
 
-	PublishedPostsOptions struct {
-		UserID uuid.UUID
-		// IsPaginate   bool
+	PaginatePostOptions struct {
+		UserID       uuid.UUID
 		CurrentPage  int
 		PostsPerPage int
 	}
 
-	PublishedPostsPagination struct {
+	PostPagination struct {
 		Posts        []domain.Post
 		PostsCount   int
 		PreviousPage int
@@ -83,7 +83,8 @@ type (
 
 	Post interface {
 		Find(context.Context, uuid.UUID) (domain.Post, error)
-		GetAllPublishedPaginate(context.Context, PublishedPostsOptions) (PublishedPostsPagination, error)
+		GetAllPublishedPaginate(context.Context, PaginatePostOptions) (PostPagination, error)
+		GetAllSelfPaginate(context.Context, PaginatePostOptions) (PostPagination, error)
 		Create(context.Context, CreatePostInput) (domain.Post, error)
 		Update(context.Context, UpdatePostInput) (domain.Post, error)
 		Publish(context.Context, uuid.UUID) (domain.Post, error)

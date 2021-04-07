@@ -24,6 +24,7 @@ func (h *Handler) Init(r chi.Router) {
 
 			r.Group(func(r chi.Router) {
 				r.Use(h.authenticateMiddleware)
+				r.Get("/self", h.GetSelfUser)
 				r.Put("/{id}", h.UpdateUser)
 			})
 		})
@@ -35,6 +36,7 @@ func (h *Handler) Init(r chi.Router) {
 			r.Group(func(r chi.Router) {
 				r.Use(h.authenticateMiddleware)
 				r.Post("/", h.CreatePost)
+				r.Get("/self", h.GetAllSelfPosts)
 				r.Put("/{id}", h.UpdatePost)
 				r.Get("/{id}/publish", h.PublishPost)
 				r.Delete("/{id}", h.DeletePost)

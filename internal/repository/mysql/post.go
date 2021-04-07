@@ -59,6 +59,16 @@ func (r *PostRepos) GetAllPublishedWithUserID(ctx context.Context, id uuid.UUID,
 	return posts, err
 }
 
+func (r *PostRepos) GetAllWithUserID(ctx context.Context, id uuid.UUID, offset int, count int) ([]domain.Post, error) {
+	var posts []domain.Post
+	query := fmt.Sprintf("select * from %s where user_id = ? limit ?, ?", postsTable)
+	err := r.database.Select(ctx, &posts, query, id, offset, count)
+	if posts == nil {
+		posts = []domain.Post{}
+	}
+	return posts, err
+}
+
 func (r *PostRepos) AllPublishedCount(ctx context.Context) (int, error) {
 	var count int
 	query := fmt.Sprintf("select count(*) from %s where (published_at is not null and deleted_at is null)", postsTable)
@@ -69,6 +79,13 @@ func (r *PostRepos) AllPublishedCount(ctx context.Context) (int, error) {
 func (r *PostRepos) AllPublishedCountWithUserID(ctx context.Context, id uuid.UUID) (int, error) {
 	var count int
 	query := fmt.Sprintf("select count(*) from %s where (user_id = ? and published_at is not null and deleted_at is null)", postsTable)
+	err := r.database.QueryRow(ctx, &count, query, id)
+	return count, err
+}
+
+func (r *PostRepos) TotalCountWithUserID(ctx context.Context, id uuid.UUID) (int, error) {
+	var count int
+	query := fmt.Sprintf("select count(*) from %s where user_id = ?", postsTable)
 	err := r.database.QueryRow(ctx, &count, query, id)
 	return count, err
 }

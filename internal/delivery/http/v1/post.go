@@ -45,6 +45,46 @@ func (h *Handler) GetAllPublishedPosts(w http.ResponseWriter, r *http.Request) {
 	respond(w, r, http.StatusOK, response)
 }
 
+// @Summary Get all self posts
+// @Description Get all self post with pagination
+// @ID post-get-all-self
+// @Tags Post
+// @Accept json
+// @Produce json
+// @Param current_page query int false "Number of current page"
+// @Param count_per_page query int false "Number of posts count"
+// @Success 200 {object} response.PostPaginationResponseDto
+// @Failure 403 {object} response.ErrorResponseDto
+// @Failure 500 {object} response.ErrorResponseDto
+// @Security ApiKeyAuth
+// @Router /post/self [get]
+func (h *Handler) GetAllSelfPosts(w http.ResponseWriter, r *http.Request) {
+	request := requsetdto.SelfPostPaginationRequestDto{}
+	response := responsedto.PostPaginationResponseDto{}
+
+	if response, err := request.FromRequest(r); err != nil {
+
+		log.Print(err)
+
+		errorRespond(w, r, response)
+		return
+	}
+
+	opt := request.TransformToObject()
+	pagination, err := h.post.GetAllSelfPaginate(r.Context(), opt)
+	if err != nil {
+
+		log.Print(err)
+
+		errorResp := responsedto.NewErrorResponseDto(http.StatusInternalServerError, errors.ErrInternal.Error())
+		errorRespond(w, r, errorResp)
+		return
+	}
+
+	response.TransformFromObject(pagination)
+	respond(w, r, http.StatusOK, response)
+}
+
 // @Summary Get single post
 // @Description Get single post by id
 // @ID post-get-single

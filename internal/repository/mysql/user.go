@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"strings"
 
 	"github.com/aintsashqa/go-simple-blog/internal/domain"
 	"github.com/aintsashqa/go-simple-blog/internal/repository/errors"
@@ -34,14 +35,26 @@ func (r *UserRepos) GetByEmail(ctx context.Context, email string) (domain.User, 
 	return user, err
 }
 
-func (r *UserRepos) Find(ctx context.Context, id uuid.UUID) (domain.User, error) {
+func (r *UserRepos) find(ctx context.Context, id uuid.UUID, columns ...string) (domain.User, error) {
 	var user domain.User
-	query := fmt.Sprintf("select id, username, created_at, updated_at from %s where (id = ? and deleted_at is null)", usersTable)
+	if len(columns) == 0 {
+		columns = append(columns, "*")
+	}
+	queryColumns := strings.Join(columns, ", ")
+	query := fmt.Sprintf("select %s from %s where (id = ? and deleted_at is null)", queryColumns, usersTable)
 	err := r.database.Get(ctx, &user, query, id)
 	if err == sql.ErrNoRows {
 		return user, errors.ErrUserNotFound
 	}
 	return user, err
+}
+
+func (r *UserRepos) Find(ctx context.Context, id uuid.UUID) (domain.User, error) {
+	return r.find(ctx, id, "id", "username", "created_at", "updated_at")
+}
+
+func (r *UserRepos) Self(ctx context.Context, id uuid.UUID) (domain.User, error) {
+	return r.find(ctx, id, "id", "email", "username", "created_at", "updated_at")
 }
 
 func (r *UserRepos) Update(ctx context.Context, user domain.User) error {

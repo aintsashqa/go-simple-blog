@@ -104,6 +104,50 @@ func (h *Handler) SignIn(w http.ResponseWriter, r *http.Request) {
 	respond(w, r, http.StatusOK, response)
 }
 
+// @Summary Get self user
+// @Description Get self user by authorized information
+// @ID user-get-self
+// @Tags User
+// @Accept json
+// @Produce json
+// @Success 200 {object} response.UserResponseDto
+// @Failure 403 {object} response.ErrorResponseDto
+// @Failure 404 {object} response.ErrorResponseDto
+// @Failure 500 {object} response.ErrorResponseDto
+// @Security ApiKeyAuth
+// @Router /user/self [get]
+func (h *Handler) GetSelfUser(w http.ResponseWriter, r *http.Request) {
+	request := requestdto.SelfUserRequestDto{}
+	response := responsedto.UserResponseDto{}
+
+	if response, err := request.FromRequest(r); err != nil {
+
+		log.Print(err)
+
+		errorRespond(w, r, response)
+		return
+	}
+
+	user, err := h.user.Self(r.Context(), request.ID)
+	if err != nil {
+
+		log.Print(err)
+
+		var errorResp responsedto.ErrorResponseDto
+		if err == repoerrors.ErrUserNotFound {
+			errorResp = responsedto.NewErrorResponseDto(http.StatusNotFound, err.Error())
+		} else {
+			errorResp = responsedto.NewErrorResponseDto(http.StatusInternalServerError, errors.ErrInternal.Error())
+		}
+
+		errorRespond(w, r, errorResp)
+		return
+	}
+
+	response.TransformFromObject(user)
+	respond(w, r, http.StatusOK, response)
+}
+
 // @Summary Get single user
 // @Description Get single user by id
 // @ID user-get-single

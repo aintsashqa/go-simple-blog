@@ -26,7 +26,7 @@ import (
 const (
 	ErrorResponseBodyInformationNull string = `{"code":%d,"message":"%s","information":null}`
 	ErrorResponseBody                string = `{"code":%d,"message":"%s","information":["%s"]}`
-	SignUpResponseBody               string = `{"id":"%s","username":"new username","created_at":"%v","updated_at":"%v"}`
+	SignUpResponseBody               string = `{"id":"%s","email":"%s","username":"new username","created_at":"%v","updated_at":"%v"}`
 	SignInResponseBody               string = `{"access_token":"%s"}`
 )
 
@@ -99,7 +99,7 @@ func (s *UserHTTPHandlerSuite) TestSignUpMethod() {
 			},
 			ServiceResultError:                  nil,
 			MockUserServiceSignUpMethodBehavior: mockUserServiceSignUpMethodBehavior,
-			ResponseBody:                        fmt.Sprintf(SignUpResponseBody, id, now.Format(time.RFC3339Nano), now.Format(time.RFC3339Nano)),
+			ResponseBody:                        fmt.Sprintf(SignUpResponseBody, id, "root@example.com", now.Format(time.RFC3339Nano), now.Format(time.RFC3339Nano)),
 			ResponseStatusCode:                  http.StatusCreated,
 		},
 		{

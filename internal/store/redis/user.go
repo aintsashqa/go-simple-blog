@@ -65,6 +65,27 @@ func (c *UserCache) Find(ctx context.Context, id uuid.UUID) (domain.User, error)
 	return user, err
 }
 
+func (c *UserCache) Self(ctx context.Context, id uuid.UUID) (domain.User, error) {
+	key := fmt.Sprintf(UserCacheKey, id)
+
+	if value, err := c.provider.Get(ctx, key); err == nil {
+		return c.serializer.Deserialize(value)
+	}
+
+	user, err := c.repo.Self(ctx, id)
+	if err != nil {
+		return domain.User{}, err
+	}
+
+	value, err := c.serializer.Serialize(user)
+	if err != nil {
+		return domain.User{}, err
+	}
+
+	err = c.provider.Set(ctx, key, value)
+	return user, err
+}
+
 func (c *UserCache) Update(ctx context.Context, user domain.User) error {
 	err := c.repo.Update(ctx, user)
 	if err != nil {

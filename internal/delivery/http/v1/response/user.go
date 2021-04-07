@@ -18,6 +18,7 @@ func (dto *TokenResponseDto) TransformFromObject(tokens service.Tokens) {
 
 type UserResponseDto struct {
 	ID        uuid.UUID `json:"id"`
+	Email     string    `json:"email,omitempty"`
 	Username  string    `json:"username"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
@@ -25,6 +26,7 @@ type UserResponseDto struct {
 
 func (dto *UserResponseDto) TransformFromObject(user domain.User) {
 	dto.ID = user.ID
+	dto.Email = user.Email
 	dto.Username = user.Username
 	dto.CreatedAt = user.CreatedAt
 	dto.UpdatedAt = user.UpdatedAt

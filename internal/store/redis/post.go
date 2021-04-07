@@ -76,12 +76,20 @@ func (c *PostCache) GetAllPublishedWithUserID(ctx context.Context, id uuid.UUID,
 	return c.repo.GetAllPublishedWithUserID(ctx, id, offset, count)
 }
 
+func (c *PostCache) GetAllWithUserID(ctx context.Context, id uuid.UUID, offset int, count int) ([]domain.Post, error) {
+	return c.repo.GetAllWithUserID(ctx, id, offset, count)
+}
+
 func (c *PostCache) AllPublishedCount(ctx context.Context) (int, error) {
 	return c.repo.AllPublishedCount(ctx)
 }
 
 func (c *PostCache) AllPublishedCountWithUserID(ctx context.Context, id uuid.UUID) (int, error) {
 	return c.repo.AllPublishedCountWithUserID(ctx, id)
+}
+
+func (c *PostCache) TotalCountWithUserID(ctx context.Context, id uuid.UUID) (int, error) {
+	return c.repo.TotalCountWithUserID(ctx, id)
 }
 
 func (c *PostCache) Create(ctx context.Context, post domain.Post) error {

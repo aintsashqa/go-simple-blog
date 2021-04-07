@@ -53,6 +53,21 @@ func (dto *SignInUserRequestDto) TransformToObject() service.SignInUserInput {
 	}
 }
 
+type SelfUserRequestDto struct {
+	ID uuid.UUID `json:"-"`
+}
+
+func (dto *SelfUserRequestDto) FromRequest(r *http.Request) (response.ErrorResponseDto, error) {
+	userID, casted := r.Context().Value("user_id").(uuid.UUID)
+	if !casted {
+		response := response.NewErrorResponseDto(http.StatusForbidden, errors.ErrInvalidTokenUserId.Error())
+		return response, errors.ErrInvalidTokenUserId
+	}
+
+	dto.ID = userID
+	return response.ErrorResponseDto{}, nil
+}
+
 type UpdateUserRequestDto struct {
 	ID       uuid.UUID `json:"-"`
 	Username string    `json:"username"`

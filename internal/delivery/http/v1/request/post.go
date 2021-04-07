@@ -41,8 +41,46 @@ func (dto *PostPaginationRequestDto) FromRequest(r *http.Request) {
 	dto.UserID = userID
 }
 
-func (dto *PostPaginationRequestDto) TransformToObject() service.PublishedPostsOptions {
-	return service.PublishedPostsOptions{
+func (dto *PostPaginationRequestDto) TransformToObject() service.PaginatePostOptions {
+	return service.PaginatePostOptions{
+		CurrentPage:  dto.CurrentPage,
+		PostsPerPage: dto.CountPerPage,
+		UserID:       dto.UserID,
+	}
+}
+
+type SelfPostPaginationRequestDto struct {
+	CurrentPage  int       `json:"-"`
+	CountPerPage int       `json:"-"`
+	UserID       uuid.UUID `json:"-"`
+}
+
+func (dto *SelfPostPaginationRequestDto) FromRequest(r *http.Request) (response.ErrorResponseDto, error) {
+	userID, casted := r.Context().Value("user_id").(uuid.UUID)
+	if !casted {
+		response := response.NewErrorResponseDto(http.StatusForbidden, errors.ErrInvalidTokenUserId.Error())
+		return response, errors.ErrInvalidTokenUserId
+	}
+
+	currentPage, err := strconv.Atoi(r.URL.Query().Get("current_page"))
+	if err != nil {
+		currentPage = DefaultCurrentPage
+	}
+
+	countPerPage, err := strconv.Atoi(r.URL.Query().Get("count_per_page"))
+	if err != nil {
+		countPerPage = DefaultCountPerPage
+	}
+
+	dto.CurrentPage = currentPage
+	dto.CountPerPage = countPerPage
+	dto.UserID = userID
+
+	return response.ErrorResponseDto{}, nil
+}
+
+func (dto *SelfPostPaginationRequestDto) TransformToObject() service.PaginatePostOptions {
+	return service.PaginatePostOptions{
 		CurrentPage:  dto.CurrentPage,
 		PostsPerPage: dto.CountPerPage,
 		UserID:       dto.UserID,
