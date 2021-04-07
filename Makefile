@@ -9,7 +9,7 @@ vendor:
 app-build: vendor swagger-gen
 	go build -o ./bin -i ./cmd/app
 
-app-dev: vendor
+app-dev: vendor swagger-gen
 	go run ./cmd/app
 
 mock-gen:
