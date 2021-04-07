@@ -4,13 +4,11 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/aintsashqa/go-simple-blog/internal/delivery/http/v1/errors"
 	"github.com/aintsashqa/go-simple-blog/internal/delivery/http/v1/response"
 	"github.com/aintsashqa/go-simple-blog/internal/service"
 	"github.com/go-chi/chi"
-	validation "github.com/go-ozzo/ozzo-validation/v4"
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -73,11 +71,6 @@ func (dto *CreatePostRequestDto) FromRequest(r *http.Request) (response.ErrorRes
 		return response, errors.ErrUnavailableRequestBody
 	}
 
-	if err := dto.validate(); err != nil {
-		response := response.NewErrorResponseDto(http.StatusBadRequest, errors.ErrInvalidRequestBody.Error(), strings.Split(err.Error(), "; ")...)
-		return response, errors.ErrInvalidRequestBody
-	}
-
 	return response.ErrorResponseDto{}, nil
 }
 
@@ -89,15 +82,6 @@ func (dto *CreatePostRequestDto) TransformToObject() service.CreatePostInput {
 		UserID:      dto.UserID,
 		IsPublished: dto.IsPublished,
 	}
-}
-
-func (dto *CreatePostRequestDto) validate() error {
-	return validation.ValidateStruct(dto,
-		validation.Field(&dto.Title, validation.Required, validation.Length(8, 255)),
-		validation.Field(&dto.Slug, validation.When(len(dto.Slug) != 0, validation.Length(8, 255))),
-		validation.Field(&dto.Content, validation.Required, validation.Length(500, 0)),
-		validation.Field(&dto.IsPublished),
-	)
 }
 
 type UpdatePostRequestDto struct {
@@ -116,11 +100,6 @@ func (dto *UpdatePostRequestDto) FromRequest(r *http.Request) (response.ErrorRes
 		return response, errors.ErrUnavailableRequestBody
 	}
 
-	if err := dto.validate(); err != nil {
-		response := response.NewErrorResponseDto(http.StatusBadRequest, errors.ErrInvalidRequestBody.Error(), strings.Split(err.Error(), "; ")...)
-		return response, errors.ErrInvalidRequestBody
-	}
-
 	return response.ErrorResponseDto{}, nil
 }
 
@@ -132,13 +111,4 @@ func (dto *UpdatePostRequestDto) TransformToObject() service.UpdatePostInput {
 		Content:     dto.Content,
 		IsPublished: dto.IsPublished,
 	}
-}
-
-func (dto *UpdatePostRequestDto) validate() error {
-	return validation.ValidateStruct(dto,
-		validation.Field(&dto.Title, validation.Required, validation.Length(8, 255)),
-		validation.Field(&dto.Slug, validation.When(len(dto.Slug) != 0, validation.Length(8, 255))),
-		validation.Field(&dto.Content, validation.Required, validation.Length(500, 0)),
-		validation.Field(&dto.IsPublished),
-	)
 }

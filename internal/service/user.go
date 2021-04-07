@@ -36,6 +36,10 @@ func (s *UserService) SignUp(ctx context.Context, input SignUpUserInput) (domain
 	}
 	user.Init()
 
+	if err := user.Validate(domain.CreateUserValidationAction); err != nil {
+		return domain.User{}, err
+	}
+
 	err := s.repo.Create(ctx, user)
 	return user, err
 }
@@ -70,6 +74,10 @@ func (s *UserService) Update(ctx context.Context, input UpdateUserInput) (domain
 
 	user.Username = input.Username
 	user.Update()
+
+	if err := user.Validate(domain.UpdateUserValidationAction); err != nil {
+		return domain.User{}, err
+	}
 
 	if err := s.repo.Update(ctx, user); err != nil {
 		return domain.User{}, err

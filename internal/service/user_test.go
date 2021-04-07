@@ -69,11 +69,14 @@ func (s *UserServiceSuite) TestSignUpMethod() {
 			Times(1)
 	}
 
+	repositoryResultError := errors.New("RepositoryResultError")
+
 	methodCases := []struct {
 		Name                       string
 		PasswordHash               string
 		ServiceInput               service.SignUpUserInput
 		RepositoryResultError      error
+		ServiceResultError         error
 		MockUserRepositoryBehavior MockUserRepositoryBehavior
 		MockHashProviderBehavior   MockHashProviderBehavior
 	}{
@@ -85,7 +88,20 @@ func (s *UserServiceSuite) TestSignUpMethod() {
 				Password: "secret",
 			},
 			RepositoryResultError:      nil,
+			ServiceResultError:         nil,
 			MockUserRepositoryBehavior: mockUserRepositoryBehavior,
+			MockHashProviderBehavior:   mockHashProviderBehavior,
+		},
+		{
+			Name:         "ValidationFailure",
+			PasswordHash: "secret-hash",
+			ServiceInput: service.SignUpUserInput{
+				Email:    "",
+				Password: "secret",
+			},
+			RepositoryResultError:      nil,
+			ServiceResultError:         domain.ErrUserEmailEmptyValue,
+			MockUserRepositoryBehavior: nil,
 			MockHashProviderBehavior:   mockHashProviderBehavior,
 		},
 		{
@@ -95,7 +111,8 @@ func (s *UserServiceSuite) TestSignUpMethod() {
 				Email:    "test@example.com",
 				Password: "secret",
 			},
-			RepositoryResultError:      errors.New("RepositoryResultError"),
+			RepositoryResultError:      repositoryResultError,
+			ServiceResultError:         repositoryResultError,
 			MockUserRepositoryBehavior: mockUserRepositoryBehavior,
 			MockHashProviderBehavior:   mockHashProviderBehavior,
 		},
@@ -103,11 +120,13 @@ func (s *UserServiceSuite) TestSignUpMethod() {
 
 	for _, currentCase := range methodCases {
 		s.Suite.Run(currentCase.Name, func() {
-			currentCase.MockUserRepositoryBehavior(s.MockUserRepository, currentCase.RepositoryResultError)
+			if currentCase.MockUserRepositoryBehavior != nil {
+				currentCase.MockUserRepositoryBehavior(s.MockUserRepository, currentCase.RepositoryResultError)
+			}
 			currentCase.MockHashProviderBehavior(s.MockHashProvider, currentCase.ServiceInput.Password, currentCase.PasswordHash)
 			user, err := s.CurrentService.SignUp(context.Background(), currentCase.ServiceInput)
 			s.Assertions.Equal(currentCase.ServiceInput.Email, user.Email)
-			s.Assertions.Equal(currentCase.RepositoryResultError, err)
+			s.Assertions.Equal(currentCase.ServiceResultError, err)
 		})
 	}
 }

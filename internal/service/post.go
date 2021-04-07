@@ -91,6 +91,10 @@ func (s *PostService) Create(ctx context.Context, input CreatePostInput) (domain
 	}
 	post.Init()
 
+	if err := post.Validate(domain.CreatePostValidationAction); err != nil {
+		return domain.Post{}, err
+	}
+
 	err := s.repo.Create(ctx, post)
 	return post, err
 }
@@ -111,6 +115,10 @@ func (s *PostService) Update(ctx context.Context, input UpdatePostInput) (domain
 	post.Content = input.Content
 	post.PublishedAt = null.NewTime(time.Now(), input.IsPublished)
 	post.Update()
+
+	if err := post.Validate(domain.UpdatePostValidationAction); err != nil {
+		return domain.Post{}, err
+	}
 
 	if err := s.repo.Update(ctx, post); err != nil {
 		return domain.Post{}, err

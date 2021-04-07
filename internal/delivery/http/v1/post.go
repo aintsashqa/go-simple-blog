@@ -38,7 +38,6 @@ func (h *Handler) getAllPublishedPosts(w http.ResponseWriter, r *http.Request) {
 
 		errorResp := responsedto.NewErrorResponseDto(http.StatusInternalServerError, errors.ErrInternal.Error())
 		errorRespond(w, r, errorResp)
-
 		return
 	}
 
@@ -75,7 +74,6 @@ func (h *Handler) getSinglePost(w http.ResponseWriter, r *http.Request) {
 		}
 
 		errorRespond(w, r, errorResp)
-
 		return
 	}
 
@@ -106,7 +104,6 @@ func (h *Handler) createPost(w http.ResponseWriter, r *http.Request) {
 		log.Print(err)
 
 		errorRespond(w, r, response)
-
 		return
 	}
 
@@ -116,9 +113,13 @@ func (h *Handler) createPost(w http.ResponseWriter, r *http.Request) {
 
 		log.Print(err)
 
+		if errorResp, isValidation := ValidationErrorsHandler(err); isValidation {
+			errorRespond(w, r, errorResp)
+			return
+		}
+
 		errorResp := responsedto.NewErrorResponseDto(http.StatusInternalServerError, errors.ErrInternal.Error())
 		errorRespond(w, r, errorResp)
-
 		return
 	}
 
@@ -150,7 +151,6 @@ func (h *Handler) updatePost(w http.ResponseWriter, r *http.Request) {
 		log.Print(err)
 
 		errorRespond(w, r, response)
-
 		return
 	}
 
@@ -160,6 +160,11 @@ func (h *Handler) updatePost(w http.ResponseWriter, r *http.Request) {
 
 		log.Print(err)
 
+		if errorResp, isValidation := ValidationErrorsHandler(err); isValidation {
+			errorRespond(w, r, errorResp)
+			return
+		}
+
 		var errorResp responsedto.ErrorResponseDto
 		if err == repoerrors.ErrPostNotFound {
 			errorResp = responsedto.NewErrorResponseDto(http.StatusNotFound, err.Error())
@@ -168,7 +173,6 @@ func (h *Handler) updatePost(w http.ResponseWriter, r *http.Request) {
 		}
 
 		errorRespond(w, r, errorResp)
-
 		return
 	}
 
@@ -206,7 +210,6 @@ func (h *Handler) publishPost(w http.ResponseWriter, r *http.Request) {
 		}
 
 		errorRespond(w, r, errorResp)
-
 		return
 	}
 

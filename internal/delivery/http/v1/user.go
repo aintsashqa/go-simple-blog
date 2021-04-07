@@ -35,7 +35,6 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 		log.Print(err)
 
 		errorRespond(w, r, response)
-
 		return
 	}
 
@@ -45,9 +44,13 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 
 		log.Print(err)
 
+		if errorResp, isValidation := ValidationErrorsHandler(err); isValidation {
+			errorRespond(w, r, errorResp)
+			return
+		}
+
 		errorResp := responsedto.NewErrorResponseDto(http.StatusInternalServerError, errors.ErrInternal.Error())
 		errorRespond(w, r, errorResp)
-
 		return
 	}
 
@@ -76,7 +79,6 @@ func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 		log.Print(err)
 
 		errorRespond(w, r, response)
-
 		return
 	}
 
@@ -96,7 +98,6 @@ func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 		}
 
 		errorRespond(w, r, errorResp)
-
 		return
 	}
 
@@ -132,7 +133,6 @@ func (h *Handler) getSingleUser(w http.ResponseWriter, r *http.Request) {
 		}
 
 		errorRespond(w, r, errorResp)
-
 		return
 	}
 
@@ -165,7 +165,6 @@ func (h *Handler) updateUser(w http.ResponseWriter, r *http.Request) {
 		log.Print(err)
 
 		errorRespond(w, r, response)
-
 		return
 	}
 
@@ -175,6 +174,11 @@ func (h *Handler) updateUser(w http.ResponseWriter, r *http.Request) {
 
 		log.Print(err)
 
+		if errorResp, isValidation := ValidationErrorsHandler(err); isValidation {
+			errorRespond(w, r, errorResp)
+			return
+		}
+
 		var errorResp responsedto.ErrorResponseDto
 		if err == repoerrors.ErrUserNotFound {
 			errorResp = responsedto.NewErrorResponseDto(http.StatusNotFound, err.Error())
@@ -183,7 +187,6 @@ func (h *Handler) updateUser(w http.ResponseWriter, r *http.Request) {
 		}
 
 		errorRespond(w, r, errorResp)
-
 		return
 	}
 
@@ -200,7 +203,6 @@ func (h *Handler) authenticateMiddleware(next http.Handler) http.Handler {
 
 			errorResp := responsedto.NewErrorResponseDto(http.StatusUnauthorized, errors.ErrEmptyAuthorizationHeader.Error())
 			errorRespond(w, r, errorResp)
-
 			return
 		}
 
@@ -211,7 +213,6 @@ func (h *Handler) authenticateMiddleware(next http.Handler) http.Handler {
 
 			errorResp := responsedto.NewErrorResponseDto(http.StatusUnauthorized, errors.ErrInvalidAuthorizationHeader.Error())
 			errorRespond(w, r, errorResp)
-
 			return
 		}
 
@@ -222,7 +223,6 @@ func (h *Handler) authenticateMiddleware(next http.Handler) http.Handler {
 
 			errorResp := responsedto.NewErrorResponseDto(http.StatusUnauthorized, errors.ErrAuthenticationFailed.Error())
 			errorRespond(w, r, errorResp)
-
 			return
 		}
 
@@ -232,7 +232,6 @@ func (h *Handler) authenticateMiddleware(next http.Handler) http.Handler {
 
 			errorResp := responsedto.NewErrorResponseDto(http.StatusUnauthorized, errors.ErrInvalidTokenUserId.Error())
 			errorRespond(w, r, errorResp)
-
 			return
 		}
 
