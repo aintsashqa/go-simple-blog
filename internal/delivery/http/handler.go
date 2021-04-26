@@ -12,14 +12,12 @@ import (
 )
 
 type Handler struct {
-	user service.User
-	post service.Post
+	Service *service.Service
 }
 
 func NewHandler(services *service.Service) *Handler {
 	return &Handler{
-		user: services.User,
-		post: services.Post,
+		Service: services,
 	}
 }
 
@@ -45,7 +43,7 @@ func (h *Handler) swagger(r chi.Router, host string, port int) {
 }
 
 func (h *Handler) api(r chi.Router) {
-	version1 := v1.NewHandler(h.user, h.post)
+	version1 := v1.NewHandler(h.Service)
 
 	r.Route("/api", func(r chi.Router) {
 		version1.Init(r)

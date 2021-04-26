@@ -39,7 +39,7 @@ func (h *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
 	}
 
 	opt := request.TransformToObject()
-	user, err := h.user.SignUp(r.Context(), opt)
+	user, err := h.Service.User.SignUp(r.Context(), opt)
 	if err != nil {
 
 		log.Print(err)
@@ -82,7 +82,7 @@ func (h *Handler) SignIn(w http.ResponseWriter, r *http.Request) {
 	}
 
 	opt := request.TransformToObject()
-	tokens, err := h.user.SignIn(r.Context(), opt)
+	tokens, err := h.Service.User.SignIn(r.Context(), opt)
 	if err != nil {
 
 		log.Print(err)
@@ -128,7 +128,7 @@ func (h *Handler) GetSelfUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := h.user.Self(r.Context(), request.ID)
+	user, err := h.Service.User.Self(r.Context(), request.ID)
 	if err != nil {
 
 		log.Print(err)
@@ -163,7 +163,7 @@ func (h *Handler) GetSingleUser(w http.ResponseWriter, r *http.Request) {
 	response := responsedto.UserResponseDto{}
 
 	id := uuid.FromStringOrNil(chi.URLParam(r, "id"))
-	user, err := h.user.Find(r.Context(), id)
+	user, err := h.Service.User.Find(r.Context(), id)
 	if err != nil {
 
 		log.Print(err)
@@ -212,7 +212,7 @@ func (h *Handler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	opt := request.TransformToObject()
-	user, err := h.user.Update(r.Context(), opt)
+	user, err := h.Service.User.Update(r.Context(), opt)
 	if err != nil {
 
 		log.Print(err)
@@ -259,7 +259,7 @@ func (h *Handler) authenticateMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		id, err := h.user.Authenticate(r.Context(), service.AuthenticateUserInput{Token: headerPieces[1]})
+		id, err := h.Service.User.Authenticate(r.Context(), service.AuthenticateUserInput{Token: headerPieces[1]})
 		if err != nil {
 
 			log.Print(err)

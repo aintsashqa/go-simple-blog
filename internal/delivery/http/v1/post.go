@@ -31,7 +31,7 @@ func (h *Handler) GetAllPublishedPosts(w http.ResponseWriter, r *http.Request) {
 	request.FromRequest(r)
 
 	opt := request.TransformToObject()
-	pagination, err := h.post.GetAllPublishedPaginate(r.Context(), opt)
+	pagination, err := h.Service.Post.GetAllPublishedPaginate(r.Context(), opt)
 	if err != nil {
 
 		log.Print(err)
@@ -71,7 +71,7 @@ func (h *Handler) GetAllSelfPosts(w http.ResponseWriter, r *http.Request) {
 	}
 
 	opt := request.TransformToObject()
-	pagination, err := h.post.GetAllSelfPaginate(r.Context(), opt)
+	pagination, err := h.Service.Post.GetAllSelfPaginate(r.Context(), opt)
 	if err != nil {
 
 		log.Print(err)
@@ -101,7 +101,7 @@ func (h *Handler) GetSinglePost(w http.ResponseWriter, r *http.Request) {
 
 	id := uuid.FromStringOrNil(chi.URLParam(r, "id"))
 
-	post, err := h.post.Find(r.Context(), id)
+	post, err := h.Service.Post.Find(r.Context(), id)
 	if err != nil {
 
 		log.Print(err)
@@ -148,7 +148,7 @@ func (h *Handler) CreatePost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	opt := request.TransformToObject()
-	post, err := h.post.Create(r.Context(), opt)
+	post, err := h.Service.Post.Create(r.Context(), opt)
 	if err != nil {
 
 		log.Print(err)
@@ -195,7 +195,7 @@ func (h *Handler) UpdatePost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	opt := request.TransformToObject()
-	post, err := h.post.Update(r.Context(), opt)
+	post, err := h.Service.Post.Update(r.Context(), opt)
 	if err != nil {
 
 		log.Print(err)
@@ -237,7 +237,7 @@ func (h *Handler) PublishPost(w http.ResponseWriter, r *http.Request) {
 	response := responsedto.PostResponseDto{}
 
 	id := uuid.FromStringOrNil(chi.URLParam(r, "id"))
-	post, err := h.post.Publish(r.Context(), id)
+	post, err := h.Service.Post.Publish(r.Context(), id)
 	if err != nil {
 
 		log.Print(err)
@@ -283,7 +283,7 @@ func (h *Handler) DeletePost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	opt := request.TransformToObject()
-	if err := h.post.SoftDelete(r.Context(), opt); err != nil {
+	if err := h.Service.Post.SoftDelete(r.Context(), opt); err != nil {
 
 		log.Print(err)
 

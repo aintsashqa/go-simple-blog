@@ -49,7 +49,8 @@ func (s *UserHTTPHandlerSuite) SetupTest() {
 	s.Assertions = require.New(s.T())
 	s.Controller = gomock.NewController(s.T())
 	s.MockUserService = mock_service.NewMockUser(s.Controller)
-	s.CurrentHTTPHandler = v1.NewHandler(s.MockUserService, nil)
+	service := service.Service{User: s.MockUserService}
+	s.CurrentHTTPHandler = v1.NewHandler(&service)
 }
 
 func (s *UserHTTPHandlerSuite) TearDownTest() {

@@ -6,12 +6,11 @@ import (
 )
 
 type Handler struct {
-	user service.User
-	post service.Post
+	Service *service.Service
 }
 
-func NewHandler(user service.User, post service.Post) *Handler {
-	return &Handler{user: user, post: post}
+func NewHandler(service *service.Service) *Handler {
+	return &Handler{Service: service}
 }
 
 func (h *Handler) Init(r chi.Router) {
