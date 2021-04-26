@@ -17,6 +17,7 @@ import (
 	repoerr "github.com/aintsashqa/go-simple-blog/internal/repository/errors"
 	"github.com/aintsashqa/go-simple-blog/internal/service"
 	mock_service "github.com/aintsashqa/go-simple-blog/internal/service/mocks"
+	mock_logger "github.com/aintsashqa/go-simple-blog/pkg/logger/mocks"
 	"github.com/golang/mock/gomock"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/require"
@@ -36,7 +37,8 @@ type UserHTTPHandlerSuite struct {
 
 	Controller *gomock.Controller
 
-	MockUserService *mock_service.MockUser
+	MockUserService   *mock_service.MockUser
+	MockLoggerService *mock_logger.MockLogger
 
 	CurrentHTTPHandler *v1.Handler
 }
@@ -49,7 +51,11 @@ func (s *UserHTTPHandlerSuite) SetupTest() {
 	s.Assertions = require.New(s.T())
 	s.Controller = gomock.NewController(s.T())
 	s.MockUserService = mock_service.NewMockUser(s.Controller)
-	service := service.Service{User: s.MockUserService}
+	s.MockLoggerService = mock_logger.NewMockLogger(s.Controller)
+
+	s.MockLoggerService.EXPECT().Errorf(gomock.Any(), gomock.Any()).AnyTimes()
+
+	service := service.Service{User: s.MockUserService, Logger: s.MockLoggerService}
 	s.CurrentHTTPHandler = v1.NewHandler(&service)
 }
 

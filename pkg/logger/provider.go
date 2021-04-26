@@ -1,3 +1,4 @@
+//go:generate mockgen -source=provider.go -destination=mocks/mock.go
 package logger
 
 import (
