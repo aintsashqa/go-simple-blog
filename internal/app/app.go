@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -18,6 +17,7 @@ import (
 	"github.com/aintsashqa/go-simple-blog/pkg/cache/redis"
 	"github.com/aintsashqa/go-simple-blog/pkg/database/mysql"
 	"github.com/aintsashqa/go-simple-blog/pkg/hash/bcrypt"
+	standart "github.com/aintsashqa/go-simple-blog/pkg/logger/standard"
 	"github.com/aintsashqa/go-simple-blog/seeds"
 )
 
@@ -32,11 +32,14 @@ import (
 func Run() {
 	ctx := context.Background()
 
+	logger := standart.NewStandartLoggerProvider()
+	logger.Info("Initialize config")
 	cfg, err := config.Init("config")
 	if err != nil {
-		log.Fatal(err)
+		logger.Critical(err)
 	}
 
+	logger.Info("Initialize database connection")
 	database, err := mysql.NewMySQLProvider(mysql.Config{
 		Host:     cfg.Database.Host,
 		Port:     cfg.Database.Port,
@@ -46,16 +49,18 @@ func Run() {
 		Charset:  cfg.Database.Charset,
 	})
 	if err != nil {
-		log.Fatal(err)
+		logger.Critical(err)
 	}
 
 	if cfg.Development {
+		logger.Info("Seeding database")
 		seeder := seeds.NewSeeder(database)
 		if err := seeder.Seed(ctx, seeds.UserSeed, seeds.PostSeed); err != nil {
-			log.Fatal(err)
+			logger.Critical(err)
 		}
 	}
 
+	logger.Info("Initialize cache")
 	cache, err := redis.NewRedisProvider(ctx, redis.Config{
 		Host:     cfg.Cache.Host,
 		Port:     cfg.Cache.Port,
@@ -64,9 +69,10 @@ func Run() {
 		Database: cfg.Cache.Database,
 	}, cfg.Cache.Expires)
 	if err != nil {
-		log.Fatal(err)
+		logger.Critical(err)
 	}
 
+	logger.Info("Initialize dependecies")
 	repos := repository.NewRepository(database)
 	serializer := serializer.NewSerializer()
 	store := store.NewCacheStore(repos, cache, serializer)
@@ -74,6 +80,7 @@ func Run() {
 	auth := jwt.NewJWTAuthorizationProvider(cfg.Auth.JWTSigningKey)
 
 	services := service.NewService(service.ServiceDependencies{
+		Logger:                        logger,
 		DataProvider:                  store,
 		Hasher:                        hasher,
 		Authorization:                 auth,
@@ -82,14 +89,15 @@ func Run() {
 
 	handler := http.NewHandler(services)
 
+	logger.Info("Starting server")
 	srv := server.NewServer(cfg.App, handler.Init(cfg.App.Host, cfg.App.Port))
 	go func() {
 		if err := srv.Run(); err != nil {
-			log.Fatal(err)
+			logger.Critical(err)
 		}
 	}()
 
-	log.Print("Server started")
+	logger.Info("Server started")
 
 	// Graceful Shutdown
 	quit := make(chan os.Signal, 1)
@@ -98,6 +106,6 @@ func Run() {
 	<-quit
 
 	if err := database.Close(); err != nil {
-		log.Fatal(err)
+		logger.Critical(err)
 	}
 }

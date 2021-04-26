@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/aintsashqa/go-simple-blog/internal/delivery/http/v1/errors"
@@ -34,7 +33,7 @@ func (h *Handler) GetAllPublishedPosts(w http.ResponseWriter, r *http.Request) {
 	pagination, err := h.Service.Post.GetAllPublishedPaginate(r.Context(), opt)
 	if err != nil {
 
-		log.Print(err)
+		h.Service.Logger.Errorf("v1.GetAllPublishedPosts error: %s", err)
 
 		errorResp := responsedto.NewErrorResponseDto(http.StatusInternalServerError, errors.ErrInternal.Error())
 		errorRespond(w, r, errorResp)
@@ -64,7 +63,7 @@ func (h *Handler) GetAllSelfPosts(w http.ResponseWriter, r *http.Request) {
 
 	if response, err := request.FromRequest(r); err != nil {
 
-		log.Print(err)
+		h.Service.Logger.Errorf("v1.GetAllSelfPosts error: %s", err)
 
 		errorRespond(w, r, response)
 		return
@@ -74,7 +73,7 @@ func (h *Handler) GetAllSelfPosts(w http.ResponseWriter, r *http.Request) {
 	pagination, err := h.Service.Post.GetAllSelfPaginate(r.Context(), opt)
 	if err != nil {
 
-		log.Print(err)
+		h.Service.Logger.Errorf("v1.GetAllSelfPosts error: %s", err)
 
 		errorResp := responsedto.NewErrorResponseDto(http.StatusInternalServerError, errors.ErrInternal.Error())
 		errorRespond(w, r, errorResp)
@@ -104,7 +103,7 @@ func (h *Handler) GetSinglePost(w http.ResponseWriter, r *http.Request) {
 	post, err := h.Service.Post.Find(r.Context(), id)
 	if err != nil {
 
-		log.Print(err)
+		h.Service.Logger.Errorf("v1.GetSinglePost error: %s", err)
 
 		var errorResp responsedto.ErrorResponseDto
 		if err == repoerrors.ErrPostNotFound {
@@ -141,7 +140,7 @@ func (h *Handler) CreatePost(w http.ResponseWriter, r *http.Request) {
 
 	if response, err := request.FromRequest(r); err != nil {
 
-		log.Print(err)
+		h.Service.Logger.Errorf("v1.CreatePost error: %s", err)
 
 		errorRespond(w, r, response)
 		return
@@ -151,7 +150,7 @@ func (h *Handler) CreatePost(w http.ResponseWriter, r *http.Request) {
 	post, err := h.Service.Post.Create(r.Context(), opt)
 	if err != nil {
 
-		log.Print(err)
+		h.Service.Logger.Errorf("v1.CreatePost error: %s", err)
 
 		if errorResp, isValidation := ValidationErrorsHandler(err); isValidation {
 			errorRespond(w, r, errorResp)
@@ -188,7 +187,7 @@ func (h *Handler) UpdatePost(w http.ResponseWriter, r *http.Request) {
 
 	if response, err := request.FromRequest(r); err != nil {
 
-		log.Print(err)
+		h.Service.Logger.Errorf("v1.UpdatePost error: %s", err)
 
 		errorRespond(w, r, response)
 		return
@@ -198,7 +197,7 @@ func (h *Handler) UpdatePost(w http.ResponseWriter, r *http.Request) {
 	post, err := h.Service.Post.Update(r.Context(), opt)
 	if err != nil {
 
-		log.Print(err)
+		h.Service.Logger.Errorf("v1.UpdatePost error: %s", err)
 
 		if errorResp, isValidation := ValidationErrorsHandler(err); isValidation {
 			errorRespond(w, r, errorResp)
@@ -240,7 +239,7 @@ func (h *Handler) PublishPost(w http.ResponseWriter, r *http.Request) {
 	post, err := h.Service.Post.Publish(r.Context(), id)
 	if err != nil {
 
-		log.Print(err)
+		h.Service.Logger.Errorf("v1.PublishPost error: %s", err)
 
 		var errorResp responsedto.ErrorResponseDto
 		if err == repoerrors.ErrPostNotFound {
@@ -276,7 +275,7 @@ func (h *Handler) DeletePost(w http.ResponseWriter, r *http.Request) {
 
 	if response, err := request.FromRequest(r); err != nil {
 
-		log.Print(err)
+		h.Service.Logger.Errorf("v1.DeletePost error: %s", err)
 
 		errorRespond(w, r, response)
 		return
@@ -285,7 +284,7 @@ func (h *Handler) DeletePost(w http.ResponseWriter, r *http.Request) {
 	opt := request.TransformToObject()
 	if err := h.Service.Post.SoftDelete(r.Context(), opt); err != nil {
 
-		log.Print(err)
+		h.Service.Logger.Errorf("v1.DeletePost error: %s", err)
 
 		var errorResp responsedto.ErrorResponseDto
 		if err == repoerrors.ErrPostNotFound {

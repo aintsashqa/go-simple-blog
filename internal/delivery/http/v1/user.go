@@ -2,7 +2,6 @@ package v1
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"strings"
 
@@ -32,7 +31,7 @@ func (h *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
 
 	if response, err := request.FromRequest(r); err != nil {
 
-		log.Print(err)
+		h.Service.Logger.Errorf("v1.SignUp error: %s", err)
 
 		errorRespond(w, r, response)
 		return
@@ -42,7 +41,7 @@ func (h *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
 	user, err := h.Service.User.SignUp(r.Context(), opt)
 	if err != nil {
 
-		log.Print(err)
+		h.Service.Logger.Errorf("v1.SignUp error: %s", err)
 
 		if errorResp, isValidation := ValidationErrorsHandler(err); isValidation {
 			errorRespond(w, r, errorResp)
@@ -75,7 +74,7 @@ func (h *Handler) SignIn(w http.ResponseWriter, r *http.Request) {
 
 	if response, err := request.FromRequest(r); err != nil {
 
-		log.Print(err)
+		h.Service.Logger.Errorf("v1.SignIn error: %s", err)
 
 		errorRespond(w, r, response)
 		return
@@ -85,7 +84,7 @@ func (h *Handler) SignIn(w http.ResponseWriter, r *http.Request) {
 	tokens, err := h.Service.User.SignIn(r.Context(), opt)
 	if err != nil {
 
-		log.Print(err)
+		h.Service.Logger.Errorf("v1.SignIn error: %s", err)
 
 		// TODO: check passwords not equals to send StatusBadRequest
 		var errorResp responsedto.ErrorResponseDto
@@ -122,7 +121,7 @@ func (h *Handler) GetSelfUser(w http.ResponseWriter, r *http.Request) {
 
 	if response, err := request.FromRequest(r); err != nil {
 
-		log.Print(err)
+		h.Service.Logger.Errorf("v1.GetSelfUser error: %s", err)
 
 		errorRespond(w, r, response)
 		return
@@ -131,7 +130,7 @@ func (h *Handler) GetSelfUser(w http.ResponseWriter, r *http.Request) {
 	user, err := h.Service.User.Self(r.Context(), request.ID)
 	if err != nil {
 
-		log.Print(err)
+		h.Service.Logger.Errorf("v1.GetSelfUser error: %s", err)
 
 		var errorResp responsedto.ErrorResponseDto
 		if err == repoerrors.ErrUserNotFound {
@@ -166,7 +165,7 @@ func (h *Handler) GetSingleUser(w http.ResponseWriter, r *http.Request) {
 	user, err := h.Service.User.Find(r.Context(), id)
 	if err != nil {
 
-		log.Print(err)
+		h.Service.Logger.Errorf("v1.GetSingleUser error: %s", err)
 
 		var errorResp responsedto.ErrorResponseDto
 		if err == repoerrors.ErrUserNotFound {
@@ -205,7 +204,7 @@ func (h *Handler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 
 	if response, err := request.FromRequest(r); err != nil {
 
-		log.Print(err)
+		h.Service.Logger.Errorf("v1.UpdateUser error: %s", err)
 
 		errorRespond(w, r, response)
 		return
@@ -215,7 +214,7 @@ func (h *Handler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	user, err := h.Service.User.Update(r.Context(), opt)
 	if err != nil {
 
-		log.Print(err)
+		h.Service.Logger.Errorf("v1.UpdateUser error: %s", err)
 
 		if errorResp, isValidation := ValidationErrorsHandler(err); isValidation {
 			errorRespond(w, r, errorResp)
@@ -242,7 +241,7 @@ func (h *Handler) authenticateMiddleware(next http.Handler) http.Handler {
 		header := r.Header.Get("Authorization")
 		if len(header) == 0 {
 
-			log.Print(errors.ErrEmptyAuthorizationHeader.Error())
+			h.Service.Logger.Errorf("v1.authenticateMiddleware error: %s", errors.ErrEmptyAuthorizationHeader)
 
 			errorResp := responsedto.NewErrorResponseDto(http.StatusUnauthorized, errors.ErrEmptyAuthorizationHeader.Error())
 			errorRespond(w, r, errorResp)
@@ -252,7 +251,7 @@ func (h *Handler) authenticateMiddleware(next http.Handler) http.Handler {
 		headerPieces := strings.Split(header, " ")
 		if len(headerPieces) != 2 {
 
-			log.Print(errors.ErrInvalidAuthorizationHeader.Error())
+			h.Service.Logger.Errorf("v1.authenticateMiddleware error: %s", errors.ErrInvalidAuthorizationHeader)
 
 			errorResp := responsedto.NewErrorResponseDto(http.StatusUnauthorized, errors.ErrInvalidAuthorizationHeader.Error())
 			errorRespond(w, r, errorResp)
@@ -262,7 +261,7 @@ func (h *Handler) authenticateMiddleware(next http.Handler) http.Handler {
 		id, err := h.Service.User.Authenticate(r.Context(), service.AuthenticateUserInput{Token: headerPieces[1]})
 		if err != nil {
 
-			log.Print(err)
+			h.Service.Logger.Errorf("v1.authenticateMiddleware error: %s", err)
 
 			errorResp := responsedto.NewErrorResponseDto(http.StatusUnauthorized, errors.ErrAuthenticationFailed.Error())
 			errorRespond(w, r, errorResp)
@@ -271,7 +270,7 @@ func (h *Handler) authenticateMiddleware(next http.Handler) http.Handler {
 
 		if id == uuid.Nil {
 
-			log.Print(errors.ErrInvalidTokenUserId)
+			h.Service.Logger.Errorf("v1.authenticateMiddleware error: %s", errors.ErrInvalidTokenUserId)
 
 			errorResp := responsedto.NewErrorResponseDto(http.StatusUnauthorized, errors.ErrInvalidTokenUserId.Error())
 			errorRespond(w, r, errorResp)

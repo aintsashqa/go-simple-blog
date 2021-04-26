@@ -7,7 +7,6 @@ import (
 	v1 "github.com/aintsashqa/go-simple-blog/internal/delivery/http/v1"
 	"github.com/aintsashqa/go-simple-blog/internal/service"
 	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
@@ -22,9 +21,9 @@ func NewHandler(services *service.Service) *Handler {
 }
 
 func (h *Handler) Init(host string, port int) http.Handler {
-	r := chi.NewRouter()
+	h.Service.Logger.Info("Initialize routes")
 
-	r.Use(middleware.Logger)
+	r := chi.NewRouter()
 
 	// Swagger docs
 	h.swagger(r, host, port)
@@ -36,6 +35,8 @@ func (h *Handler) Init(host string, port int) http.Handler {
 }
 
 func (h *Handler) swagger(r chi.Router, host string, port int) {
+	h.Service.Logger.Info("Initialize swagger route")
+
 	// swagger.SwaggerInfo.Host = fmt.Sprintf("%s:%d", host, port)
 	swagger.SwaggerInfo.Host = "localhost:80"
 
@@ -43,6 +44,8 @@ func (h *Handler) swagger(r chi.Router, host string, port int) {
 }
 
 func (h *Handler) api(r chi.Router) {
+	h.Service.Logger.Info("Initialize api routes")
+
 	version1 := v1.NewHandler(h.Service)
 
 	r.Route("/api", func(r chi.Router) {

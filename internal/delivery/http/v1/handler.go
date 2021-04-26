@@ -14,6 +14,8 @@ func NewHandler(service *service.Service) *Handler {
 }
 
 func (h *Handler) Init(r chi.Router) {
+	h.Service.Logger.Info("Initialize v1 routes")
+
 	r.Route("/v1", func(r chi.Router) {
 
 		r.Route("/user", func(r chi.Router) {
