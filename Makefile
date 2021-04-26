@@ -3,19 +3,19 @@
 swagger-gen:
 	swag init -g ./internal/app/app.go -o ./api/swagger
 
-vendor:
-	go mod vendor
+depend:
+	go mod tidy | go mod vendor
 
-app-build: vendor swagger-gen
+app-build: depend swagger-gen
 	go build -o ./bin -i ./cmd/app
 
-app-dev: vendor swagger-gen
+app-dev: depend swagger-gen
 	go run ./cmd/app
 
 mock-gen:
 	go generate ./...
 
-tests: vendor mock-gen
+tests: depend mock-gen
 	go test ./... -v
 
 dstop:
